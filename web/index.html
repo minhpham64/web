@@ -1,0 +1,4398 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ thống Quản lý & Điều phối Chuỗi Cung Ứng Cam Sành ĐBSCL</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <!-- Google Fonts: Inter -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+            colors: {
+              emerald: {
+                850: "#064e3b",
+                950: "#022c22",
+              },
+              orange: {
+                550: "#f97316",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      .tab-active {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      }
+      .orange-gradient {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      }
+      .green-gradient {
+        background: linear-gradient(135deg, #059669 0%, #065f46 100%);
+      }
+      @keyframes pulse-soft {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.85;
+        }
+      }
+      .animate-pulse-soft {
+        animation: pulse-soft 2.5s infinite;
+      }
+      .invoice-tag-bounce:hover {
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body
+    class="text-slate-800 antialiased selection:bg-orange-500 selection:text-white"
+  >
+    <!-- Toast Notification Container -->
+    <div
+      id="toastContainer"
+      class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
+    ></div>
+
+    <!-- Main Layout Wrapper -->
+    <div class="min-h-screen flex flex-col lg:flex-row">
+      <!-- Mobile Header -->
+      <header
+        class="lg:hidden bg-emerald-950 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-md"
+      >
+        <div class="flex items-center gap-2.5">
+          <div
+            class="w-9 h-9 rounded-xl orange-gradient flex items-center justify-center text-white font-bold shadow"
+          >
+            <i class="fa-solid fa-lemon text-lg"></i>
+          </div>
+          <div>
+            <h1 class="font-bold text-sm leading-tight">HTX CAM SÀNH ĐBSCL</h1>
+            <p class="text-[11px] text-emerald-200">
+              Điều phối Chuỗi Cung Ứng & Truy Xuất
+            </p>
+          </div>
+        </div>
+        <button
+          onclick="toggleMobileSidebar()"
+          class="p-2 rounded-lg bg-emerald-850 hover:bg-emerald-800 text-white"
+        >
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </header>
+
+      <!-- Sidebar Navigation -->
+      <aside
+        id="sidebar"
+        class="fixed inset-y-0 left-0 z-40 w-72 bg-emerald-950 text-slate-100 flex flex-col transition-transform duration-300 transform -translate-x-full lg:translate-x-0 lg:static lg:shrink-0 shadow-xl"
+      >
+        <!-- Brand Header -->
+        <div
+          class="p-5 border-b border-emerald-800/80 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl orange-gradient flex items-center justify-center text-white shadow-lg shadow-orange-500/30 shrink-0"
+            >
+              <i class="fa-solid fa-seedling text-xl"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-extrabold text-base tracking-tight text-white"
+                  >CAM SÀNH ĐBSCL</span
+                >
+              </div>
+              <p class="text-xs text-emerald-300 font-medium">
+                Hệ thống Điều phối HTX Liên Vùng
+              </p>
+            </div>
+          </div>
+          <button
+            onclick="toggleMobileSidebar()"
+            class="lg:hidden text-emerald-300 hover:text-white p-1"
+          >
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Solution Framework Badge -->
+        <div
+          class="mx-4 mt-4 p-3 rounded-xl bg-emerald-900/70 border border-emerald-700/60"
+        >
+          <div
+            class="flex items-center justify-between text-xs text-emerald-200 mb-1"
+          >
+            <span class="font-semibold"
+              ><i class="fa-solid fa-circle-check text-orange-400 mr-1"></i>
+              Liên Kết Chuỗi Giá Trị</span
+            >
+            <span
+              class="px-1.5 py-0.5 bg-orange-500/20 text-orange-300 rounded font-bold text-[10px]"
+              >Vụ Mùa 2026</span
+            >
+          </div>
+          <p class="text-[11px] text-emerald-300/90 leading-relaxed">
+            Vùng trồng (Mã PUC)
+            <i
+              class="fa-solid fa-arrow-right text-[9px] mx-0.5 text-orange-400"
+            ></i>
+            HTX Tiếp nhận
+            <i
+              class="fa-solid fa-arrow-right text-[9px] mx-0.5 text-orange-400"
+            ></i>
+            Hóa đơn & Giao nhận Doanh nghiệp
+          </p>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+          <div
+            class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400"
+          >
+            Phân Hệ Vận Hành
+          </div>
+
+          <button
+            onclick="switchTab('dashboard')"
+            id="nav-dashboard"
+            class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm font-medium transition-all tab-active"
+          >
+            <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i>
+            <div class="flex-1">
+              <div>Cân đối Cung - Cầu</div>
+              <div class="text-[10px] opacity-80 font-normal">
+                Kế hoạch tiêu thụ & Dự báo sản lượng
+              </div>
+            </div>
+          </button>
+
+          <button
+            onclick="switchTab('farmers')"
+            id="nav-farmers"
+            class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm font-medium text-emerald-100 hover:bg-emerald-900/80 transition-all"
+          >
+            <i
+              class="fa-solid fa-users-viewfinder w-5 text-center text-base"
+            ></i>
+            <div class="flex-1">
+              <div>Nông hộ & Vùng trồng</div>
+              <div class="text-[10px] opacity-75 font-normal">
+                Quản lý mã số PUC liên tỉnh
+              </div>
+            </div>
+            <span
+              id="badge-farmers-count"
+              class="px-2 py-0.5 text-xs rounded-full bg-emerald-800 text-emerald-200 font-semibold"
+              >12</span
+            >
+          </button>
+
+          <button
+            onclick="switchTab('partners')"
+            id="nav-partners"
+            class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm font-medium text-emerald-100 hover:bg-emerald-900/80 transition-all"
+          >
+            <i
+              class="fa-solid fa-handshake-simple w-5 text-center text-base"
+            ></i>
+            <div class="flex-1">
+              <div>Đơn hàng & Giao nhận</div>
+              <div class="text-[10px] opacity-75 font-normal">
+                Hợp đồng & Hóa đơn xuất kho
+              </div>
+            </div>
+            <span
+              id="badge-partners-count"
+              class="px-2 py-0.5 text-xs rounded-full bg-orange-500 text-white font-semibold"
+              >11</span
+            >
+          </button>
+
+          <button
+            onclick="switchTab('grading')"
+            id="nav-grading"
+            class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm font-medium text-emerald-100 hover:bg-emerald-900/80 transition-all"
+          >
+            <i class="fa-solid fa-scale-balanced w-5 text-center text-base"></i>
+            <div class="flex-1">
+              <div>Phân loại & Cơ chế Giá</div>
+              <div class="text-[10px] opacity-75 font-normal">
+                Hạch toán minh bạch 3 phẩm cấp
+              </div>
+            </div>
+          </button>
+
+          <button
+            onclick="switchTab('logistics')"
+            id="nav-logistics"
+            class="w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-left text-sm font-medium text-emerald-100 hover:bg-emerald-900/80 transition-all"
+          >
+            <i class="fa-solid fa-warehouse w-5 text-center text-base"></i>
+            <div class="flex-1">
+              <div>Kho đệm & Truy xuất QR</div>
+              <div class="text-[10px] opacity-75 font-normal">
+                Nhật ký lô hàng & Hóa đơn điện tử
+              </div>
+            </div>
+            <span
+              id="badge-invoices-count"
+              class="px-2 py-0.5 text-[10px] rounded-full bg-blue-600 text-white font-bold"
+              >5 HĐ</span
+            >
+          </button>
+        </nav>
+
+        <!-- Cooperative Financial Capacity Summary -->
+        <div
+          class="p-4 m-3 rounded-xl bg-emerald-900/90 border border-emerald-700/70 space-y-2.5"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-emerald-200"
+              ><i class="fa-solid fa-vault mr-1 text-orange-400"></i> Quỹ Vốn
+              Lưu Động HTX</span
+            >
+            <span class="text-xs font-bold text-emerald-300">Khả dụng</span>
+          </div>
+          <div
+            class="text-base font-extrabold text-white"
+            id="coopWorkingCapital"
+          >
+            3,650,000,000 đ
+          </div>
+          <div class="w-full bg-emerald-950 rounded-full h-1.5 overflow-hidden">
+            <div
+              class="bg-orange-400 h-1.5 rounded-full"
+              style="width: 82%"
+            ></div>
+          </div>
+          <p class="text-[11px] text-emerald-300 leading-tight">
+            Đảm bảo thanh toán tạm ứng 70% giá trị ngay khi hộ dân giao cam tại
+            điểm tập kết HTX.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Backdrop for Mobile Sidebar -->
+      <div
+        id="sidebarBackdrop"
+        onclick="toggleMobileSidebar()"
+        class="fixed inset-0 bg-slate-900/50 z-30 hidden lg:hidden"
+      ></div>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <!-- Top Desktop Header Bar -->
+        <div
+          class="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+        >
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800"
+              >
+                <i class="fa-solid fa-map-pin mr-1 text-emerald-600"></i>Vĩnh
+                Long • Hậu Giang • Tiền Giang • Bến Tre • Sóc Trăng • Cần Thơ
+              </span>
+              <span class="text-xs text-slate-400">|</span>
+              <span
+                class="text-xs font-medium text-slate-500"
+                id="currentDateDisplay"
+                >Cập nhật trực tiếp hệ thống</span
+              >
+            </div>
+            <h2
+              id="pageTitle"
+              class="text-xl sm:text-2xl font-extrabold text-slate-800 mt-1"
+            >
+              Tổng quan Cân đối Cung - Cầu & Kế hoạch Tiêu thụ
+            </h2>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button
+              onclick="openFarmerModal()"
+              class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5"
+            >
+              <i class="fa-solid fa-user-plus text-emerald-600"></i>
+              <span>+ Nông hộ / Mã vùng PUC</span>
+            </button>
+            <button
+              onclick="openOrderModal()"
+              class="px-3.5 py-2 rounded-xl orange-gradient hover:opacity-95 text-white text-xs sm:text-sm font-semibold shadow-md shadow-orange-500/20 transition flex items-center gap-1.5"
+            >
+              <i class="fa-solid fa-file-contract"></i>
+              <span>+ Đơn hàng / Hợp đồng mới</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Content Container -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6">
+          <!-- ==========================================
+                     TAB 1: TỔNG QUAN & CÂN ĐỐI CUNG - CẦU
+                     ========================================== -->
+          <section id="tab-dashboard" class="space-y-6">
+            <!-- Top 4 Supply-Demand Balance KPIs -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              <!-- KPI 1: Area & Farmers -->
+              <div
+                class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              >
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p
+                      class="text-xs font-semibold uppercase tracking-wider text-slate-400"
+                    >
+                      Vùng Nguyên Liệu Liên Vùng
+                    </p>
+                    <h3
+                      class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1"
+                      id="kpiTotalArea"
+                    >
+                      112.5 ha
+                    </h3>
+                  </div>
+                  <div
+                    class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg"
+                  >
+                    <i class="fa-solid fa-map-location-dot"></i>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"
+                >
+                  <span class="text-slate-500">Mã PUC vùng trồng:</span>
+                  <span class="font-bold text-emerald-700" id="kpiFarmerCount"
+                    >12 mã số (6 tỉnh)</span
+                  >
+                </div>
+              </div>
+
+              <!-- KPI 2: Expected Supply -->
+              <div
+                class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              >
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p
+                      class="text-xs font-semibold uppercase tracking-wider text-slate-400"
+                    >
+                      Tổng Sản Lượng Dự Kiến
+                    </p>
+                    <h3
+                      class="text-2xl sm:text-3xl font-extrabold text-slate-800 mt-1"
+                      id="kpiExpectedSupply"
+                    >
+                      1,580 tấn
+                    </h3>
+                  </div>
+                  <div
+                    class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg"
+                  >
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"
+                >
+                  <span class="text-slate-500">Đã thu hoạch tại vườn:</span>
+                  <span class="font-bold text-blue-700" id="kpiActualHarvested"
+                    >490 tấn (31%)</span
+                  >
+                </div>
+              </div>
+
+              <!-- KPI 3: Contracted Demand -->
+              <div
+                class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between"
+              >
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p
+                      class="text-xs font-semibold uppercase tracking-wider text-slate-400"
+                    >
+                      Sản Lượng Đã Ký Bao Tiêu
+                    </p>
+                    <h3
+                      class="text-2xl sm:text-3xl font-extrabold text-emerald-600 mt-1"
+                      id="kpiContractedVolume"
+                    >
+                      1,240 tấn
+                    </h3>
+                  </div>
+                  <div
+                    class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg"
+                  >
+                    <i class="fa-solid fa-file-circle-check"></i>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"
+                >
+                  <span class="text-slate-500">Tỷ lệ bao tiêu trước vụ:</span>
+                  <span
+                    class="font-bold text-emerald-700"
+                    id="kpiContractedRatio"
+                    >78.5%</span
+                  >
+                </div>
+              </div>
+
+              <!-- KPI 4: Unallocated Volume needing coordination -->
+              <div
+                id="unallocatedCard"
+                class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 border-2 border-orange-300 shadow-sm flex flex-col justify-between"
+              >
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p
+                      class="text-xs font-bold uppercase tracking-wider text-orange-700"
+                    >
+                      Chưa Có Đầu Ra (Cần Điều Phối)
+                    </p>
+                    <h3
+                      class="text-2xl sm:text-3xl font-extrabold text-orange-600 mt-1"
+                      id="kpiUnallocatedVolume"
+                    >
+                      340 tấn
+                    </h3>
+                  </div>
+                  <div
+                    class="w-11 h-11 rounded-xl bg-orange-500 text-white flex items-center justify-center text-lg shadow"
+                  >
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                  </div>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-orange-200/70 flex items-center justify-between text-xs"
+                >
+                  <span
+                    class="text-orange-800 font-medium"
+                    id="unallocatedStatusText"
+                    >Kích hoạt kênh bổ sung sớm!</span
+                  >
+                  <button
+                    onclick="openSupplementaryChannelModal()"
+                    class="font-bold text-orange-700 underline hover:text-orange-900"
+                  >
+                    Xử lý ngay &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Early Warning Banner for Unallocated Volume -->
+            <div
+              id="surplusAlertBanner"
+              class="rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-orange-600 text-white p-5 shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4"
+            >
+              <div class="flex items-start gap-4">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl shrink-0"
+                >
+                  <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                      class="px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wider bg-white text-orange-600 rounded"
+                      >Cảnh báo Cân đối Cung - Cầu Trước Vụ</span
+                    >
+                    <span class="text-xs text-orange-100 font-medium"
+                      >Chuyển dịch chủ động từ sản xuất thuần túy sang điều phối
+                      theo đơn hàng</span
+                    >
+                  </div>
+                  <h4 class="text-base sm:text-lg font-bold mt-1">
+                    Phát hiện
+                    <span
+                      id="bannerUnallocatedText"
+                      class="underline decoration-2"
+                      >340 tấn cam dự kiến</span
+                    >
+                    trong đợt thu hoạch tới chưa có hợp đồng bao tiêu!
+                  </h4>
+                  <p class="text-xs sm:text-sm text-orange-50 mt-0.5">
+                    HTX cần sớm kích hoạt các kênh phân phối bổ sung: Doanh
+                    nghiệp chế biến sâu (nước ép, mứt vỏ cam), Sàn TMĐT OCOP và
+                    chuỗi đồ uống F&B trước thời điểm chín rộ để giữ giá ổn
+                    định.
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2.5 shrink-0 w-full lg:w-auto">
+                <button
+                  onclick="openSupplementaryChannelModal()"
+                  class="w-full lg:w-auto px-4 py-2.5 rounded-xl bg-white text-orange-600 hover:bg-orange-50 font-bold text-xs sm:text-sm shadow transition flex items-center justify-center gap-2"
+                >
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>Kích hoạt Kênh Phân phối Bổ sung</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Middle Row: Supply-Demand by Channel & Harvest Schedule Coordination -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Left 2 Columns: Supply-Demand & Channel Allocation Breakdown -->
+              <div
+                class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 space-y-5"
+              >
+                <div
+                  class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4"
+                >
+                  <div>
+                    <h3
+                      class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2"
+                    >
+                      <i class="fa-solid fa-chart-column text-emerald-600"></i>
+                      <span
+                        >Kế hoạch Phân bổ Sản lượng theo Kênh Phân phối</span
+                      >
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                      Đa dạng hóa đầu ra để phân tán rủi ro và tối ưu giá trị
+                      cho từng phẩm cấp cam
+                    </p>
+                  </div>
+                  <span
+                    class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700"
+                    id="chartSummaryBadge"
+                  >
+                    Đã phân bổ: 1,240 / 1,580 tấn
+                  </span>
+                </div>
+
+                <!-- Visual Channel Bars -->
+                <div id="channelBreakdownList" class="space-y-4">
+                  <!-- Populated via JS -->
+                </div>
+
+                <!-- Weekly Harvest Scheduling -->
+                <div class="pt-4 border-t border-slate-100">
+                  <div class="flex items-center justify-between mb-3">
+                    <div>
+                      <h4 class="text-sm font-bold text-slate-800">
+                        Lịch Thu Hoạch Rải Vụ Theo Tuần
+                      </h4>
+                      <p class="text-xs text-slate-500">
+                        Điều phối lệch pha thu hoạch giữa các vùng Vĩnh Long,
+                        Hậu Giang, Tiền Giang tránh dồn ứ cục bộ
+                      </p>
+                    </div>
+                    <button
+                      onclick="rebalanceHarvestSchedule()"
+                      class="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold border border-emerald-200 transition"
+                    >
+                      <i class="fa-solid fa-sliders mr-1"></i>Tối ưu lịch cắt
+                      cam
+                    </button>
+                  </div>
+                  <div
+                    id="weeklyScheduleGrid"
+                    class="grid grid-cols-1 sm:grid-cols-4 gap-3"
+                  >
+                    <!-- Populated via JS -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Market Signal & Planning Recommendations -->
+              <div
+                class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col justify-between space-y-5"
+              >
+                <div class="space-y-4">
+                  <div
+                    class="flex items-center justify-between border-b border-slate-100 pb-3"
+                  >
+                    <div>
+                      <h3
+                        class="font-bold text-slate-800 text-base flex items-center gap-2"
+                      >
+                        <i
+                          class="fa-solid fa-compass-drafting text-orange-500"
+                        ></i>
+                        <span>Tín hiệu Thị trường & Khuyến cáo</span>
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Định hướng vùng trồng & kiểm soát diện tích
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Live Reference Price Box -->
+                  <div
+                    class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-semibold text-slate-600"
+                        >Giá Cam Tham Chiếu HTX Niêm Yết</span
+                      >
+                      <span
+                        class="px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded"
+                        >Tuần hiện tại</span
+                      >
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                      <div
+                        class="p-2.5 rounded-lg bg-white border border-slate-200 text-center"
+                      >
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          Loại 1 (Siêu thị)
+                        </div>
+                        <div
+                          class="text-sm font-extrabold text-emerald-700 mt-0.5"
+                          id="dashPriceG1"
+                        >
+                          18,000đ/kg
+                        </div>
+                      </div>
+                      <div
+                        class="p-2.5 rounded-lg bg-white border border-slate-200 text-center"
+                      >
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          Loại 2 (Bán buôn)
+                        </div>
+                        <div
+                          class="text-sm font-extrabold text-blue-700 mt-0.5"
+                          id="dashPriceG2"
+                        >
+                          13,000đ/kg
+                        </div>
+                      </div>
+                      <div
+                        class="p-2.5 rounded-lg bg-white border border-slate-200 text-center"
+                      >
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          Loại 3 (Chế biến)
+                        </div>
+                        <div
+                          class="text-sm font-extrabold text-orange-600 mt-0.5"
+                          id="dashPriceG3"
+                        >
+                          7,500đ/kg
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Planting Advisory Box -->
+                  <div
+                    class="p-4 rounded-xl bg-amber-50/90 border border-amber-200 space-y-2"
+                  >
+                    <div
+                      class="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wide"
+                    >
+                      <i class="fa-solid fa-seedling text-amber-600"></i>
+                      <span>Khuyến cáo Quy hoạch Vụ Tiếp Theo</span>
+                    </div>
+                    <p class="text-xs text-amber-900 leading-relaxed">
+                      <strong
+                        >Không mở rộng diện tích trồng mới tự phát theo đà giá
+                        ngắn hạn:</strong
+                      >
+                      Giữ vững quy mô diện tích hiện hữu (112.5 ha).
+                    </p>
+                    <ul class="text-xs text-amber-800 space-y-1 pl-4 list-disc">
+                      <li>
+                        Tập trung chuẩn hóa mã vùng trồng
+                        <strong>PUC xuất khẩu & siêu thị</strong>.
+                      </li>
+                      <li>
+                        Nâng tỷ lệ <strong>Loại 1 đạt trên 60%</strong> qua kỹ
+                        thuật tỉa cành, tưới ẩm.
+                      </li>
+                      <li>
+                        Nghiêm ngặt cách ly thuốc BVTV trước thu hoạch 21 ngày
+                        để đạt kiểm nghiệm.
+                      </li>
+                      <li>
+                        Tổ chức rải vụ thu hoạch giãn cách giữa các hợp tác xã
+                        thành viên.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Quick Jump Buttons -->
+                <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+                  <button
+                    onclick="switchTab('partners')"
+                    class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-between transition"
+                  >
+                    <span
+                      ><i class="fa-solid fa-receipt mr-2 text-orange-500"></i
+                      >Xem danh sách hợp đồng & Hóa đơn xuất kho</span
+                    >
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                  </button>
+                  <button
+                    onclick="switchTab('grading')"
+                    class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center justify-between transition"
+                  >
+                    <span
+                      ><i
+                        class="fa-solid fa-calculator mr-2 text-emerald-600"
+                      ></i
+                      >Mở bảng tính hạch toán phân loại cam</span
+                    >
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ==========================================
+                     TAB 2: QUẢN LÝ NÔNG HỘ & VÙNG TRỒNG ĐBSCL
+                     ========================================== -->
+          <section id="tab-farmers" class="hidden space-y-6">
+            <!-- Section Explanation Header -->
+            <div
+              class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+            >
+              <div>
+                <span
+                  class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-100 text-emerald-800"
+                  >Tổ chức Vùng Nguyên Liệu & Cơ Sở Dữ Liệu Nông Hộ</span
+                >
+                <h3 class="text-lg font-bold text-slate-800 mt-1">
+                  Danh sách Nông hộ & Mã Vùng Trồng (PUC) Cam Sành ĐBSCL
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500">
+                  Quản lý chuẩn hóa mã số vùng trồng PUC, diện tích, sản lượng
+                  dự kiến, nhật ký cắt cam và hợp đồng liên kết 3 bên.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  onclick="openFarmerModal()"
+                  class="px-4 py-2.5 rounded-xl green-gradient text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Đăng ký Nông hộ & Cấp Mã PUC Mới</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filters & Search Bar with Multi-Province Support -->
+            <div
+              class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"
+            >
+              <div class="relative">
+                <i
+                  class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"
+                ></i>
+                <input
+                  type="text"
+                  id="farmerSearchInput"
+                  oninput="renderFarmersTable()"
+                  placeholder="Tìm chủ hộ, mã hộ, mã PUC..."
+                  class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <select
+                  id="farmerProvinceFilter"
+                  onchange="renderFarmersTable()"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="ALL">Tất cả Tỉnh/Thành ĐBSCL</option>
+                  <option value="Vĩnh Long">
+                    Vĩnh Long (Trà Ôn, Tam Bình, Vũng Liêm)
+                  </option>
+                  <option value="Hậu Giang">
+                    Hậu Giang (Châu Thành, Phụng Hiệp)
+                  </option>
+                  <option value="Tiền Giang">
+                    Tiền Giang (Cái Bè, Cai Lậy)
+                  </option>
+                  <option value="Bến Tre">Bến Tre (Chợ Lách, Mỏ Cày)</option>
+                  <option value="Sóc Trăng">Sóc Trăng (Kế Sách)</option>
+                  <option value="Cần Thơ">TP. Cần Thơ (Phong Điền)</option>
+                </select>
+              </div>
+              <div>
+                <select
+                  id="farmerStandardFilter"
+                  onchange="renderFarmersTable()"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="ALL">Tất cả tiêu chuẩn canh tác</option>
+                  <option value="VietGAP">Đạt chuẩn VietGAP</option>
+                  <option value="GlobalGAP">Đạt chuẩn GlobalGAP</option>
+                  <option value="Hữu cơ">Hướng Hữu cơ</option>
+                  <option value="An toàn">Canh tác An toàn HTX</option>
+                </select>
+              </div>
+              <div>
+                <select
+                  id="farmerContractFilter"
+                  onchange="renderFarmersTable()"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-emerald-500"
+                >
+                  <option value="ALL">Tất cả trạng thái Hợp đồng</option>
+                  <option value="Đã ký HĐ 3 bên">Đã ký Hợp đồng 3 bên</option>
+                  <option value="Đang thẩm định vùng">
+                    Đang thẩm định vùng trồng
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Farmers Table -->
+            <div
+              class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden"
+            >
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr
+                      class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500"
+                    >
+                      <th class="py-3.5 px-4">Mã Hộ / Mã Vùng PUC</th>
+                      <th class="py-3.5 px-4">Chủ Hộ & Địa Bàn</th>
+                      <th class="py-3.5 px-4">Tiêu Chuẩn</th>
+                      <th class="py-3.5 px-4 text-right">Diện Tích</th>
+                      <th class="py-3.5 px-4 text-right">SL Dự Kiến</th>
+                      <th class="py-3.5 px-4 text-right">Đã Thu Hoạch</th>
+                      <th class="py-3.5 px-4">Lịch Thu Hoạch</th>
+                      <th class="py-3.5 px-4">Hợp Đồng</th>
+                      <th class="py-3.5 px-4 text-center">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="farmersTableBody"
+                    class="divide-y divide-slate-100 text-sm"
+                  >
+                    <!-- Populated via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- ==========================================
+                     TAB 3: DOANH NGHIỆP, THƯƠNG LÁI & GIAO NHẬN ĐƠN HÀNG
+                     ========================================== -->
+          <section id="tab-partners" class="hidden space-y-6">
+            <!-- Sub-navigation for Partners Tab -->
+            <div
+              class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div class="flex flex-wrap gap-2">
+                <button
+                  onclick="switchPartnerSubTab('enterprises')"
+                  id="subtab-enterprises"
+                  class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-700 text-white shadow-sm transition"
+                >
+                  <i class="fa-solid fa-truck-fast mr-1.5"></i>Đơn hàng Doanh
+                  nghiệp & Hóa đơn
+                </button>
+                <button
+                  onclick="switchPartnerSubTab('traders')"
+                  id="subtab-traders"
+                  class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+                >
+                  <i class="fa-solid fa-truck-ramp-box mr-1.5"></i>Thương lái
+                  Đối tác HTX
+                </button>
+                <button
+                  onclick="switchPartnerSubTab('contracts')"
+                  id="subtab-contracts"
+                  class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+                >
+                  <i class="fa-solid fa-file-shield mr-1.5"></i>Khung Hợp đồng
+                  Liên kết 3 Bên
+                </button>
+              </div>
+              <button
+                onclick="openOrderModal()"
+                class="px-4 py-2 rounded-xl orange-gradient text-white text-xs sm:text-sm font-semibold shadow-sm hover:opacity-95 transition flex items-center gap-1.5"
+              >
+                <i class="fa-solid fa-plus"></i>
+                <span>Tạo Hợp đồng / Đơn đặt mua</span>
+              </button>
+            </div>
+
+            <!-- SUB-TAB A: DOANH NGHIỆP & GIAO HÀNG TỪNG ĐỢT & HÓA ĐƠN ĐIỆN TỬ -->
+            <div id="partnerView-enterprises" class="space-y-4">
+              <div
+                class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+              >
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shrink-0"
+                  >
+                    <i class="fa-solid fa-receipt"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-slate-800 text-sm">
+                      Hệ Thống Hóa Đơn & Phiếu Xuất Kho Điện Tử
+                    </h4>
+                    <p class="text-xs text-slate-600">
+                      Mỗi đợt xuất hàng đều cấp một
+                      <strong>Hóa đơn điện tử</strong>. Bấm trực tiếp vào mã hóa
+                      đơn (ví dụ
+                      <span
+                        class="font-mono bg-white px-1.5 py-0.5 rounded border border-blue-200 text-blue-700 font-bold"
+                        >HDXK-101-01</span
+                      >) để mở nhanh Hộ chiếu Nông sản & Chứng từ tại phân hệ
+                      Logistics.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+                id="enterpriseCardsContainer"
+              >
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- SUB-TAB B: THƯƠNG LÁI ĐỐI TÁC CÓ ĐIỀU PHỐI -->
+            <div id="partnerView-traders" class="hidden space-y-4">
+              <div
+                class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              >
+                <div class="space-y-1">
+                  <span
+                    class="px-2 py-0.5 bg-emerald-700 text-white rounded text-[10px] font-bold uppercase"
+                    >Chuyển đổi vai trò Thương lái</span
+                  >
+                  <h4 class="font-bold text-emerald-950 text-base">
+                    Thương lái là đối tác thu gom có điều phối — Không ép giá
+                    nông dân
+                  </h4>
+                  <p class="text-xs text-emerald-800">
+                    Thương lái ký kết phân vùng phụ trách thu gom theo hợp đồng,
+                    nhận phí điều phối vận chuyển cố định theo kg và tuân thủ
+                    bảng phân loại chất lượng của HTX.
+                  </p>
+                </div>
+                <button
+                  onclick="openTraderModal()"
+                  class="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shrink-0 transition"
+                >
+                  + Thêm Thương lái Đối tác
+                </button>
+              </div>
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                id="tradersCardsContainer"
+              >
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- SUB-TAB C: KHUNG HỢP ĐỒNG LIÊN KẾT 3 BÊN -->
+            <div id="partnerView-contracts" class="hidden space-y-5">
+              <div
+                class="bg-white rounded-2xl border border-slate-200 p-6 space-y-6"
+              >
+                <div class="border-b border-slate-100 pb-4">
+                  <span
+                    class="px-2.5 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800"
+                    >Cơ Chế Ràng Buộc Trách Nhiệm & Chia Sẻ Lợi Ích</span
+                  >
+                  <h3 class="text-lg font-extrabold text-slate-800 mt-2">
+                    Mô hình Hợp đồng Liên kết 3 Bên (Nông hộ - HTX - Doanh
+                    nghiệp)
+                  </h3>
+                  <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    Chấm dứt vòng luẩn quẩn nông dân bẻ kèo bán ra ngoài khi sốt
+                    giá, hoặc thương lái / doanh nghiệp bỏ cọc ép giá khi rộ vụ.
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <!-- Role 1: Nông hộ -->
+                  <div
+                    class="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold"
+                      >
+                        1
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-emerald-950">
+                          Bên A: Nông hộ Vùng Trồng
+                        </h4>
+                        <p class="text-xs text-emerald-700">
+                          Đơn vị trực tiếp canh tác (Mã PUC)
+                        </p>
+                      </div>
+                    </div>
+                    <ul class="text-xs text-slate-700 space-y-2 list-disc pl-4">
+                      <li>
+                        Cung cấp chính xác diện tích, mã số PUC và thời điểm thu
+                        hoạch.
+                      </li>
+                      <li>
+                        Tuân thủ tiêu chuẩn VietGAP/GlobalGAP, ghi chép nhật ký
+                        điện tử.
+                      </li>
+                      <li>
+                        <strong>Cam kết giao 100% sản lượng đã đăng ký</strong>
+                        cho điểm tập kết HTX, không bán xô ra thị trường trôi
+                        nổi.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Role 2: Hợp tác xã -->
+                  <div
+                    class="p-5 rounded-2xl bg-orange-50/70 border border-orange-200 space-y-3"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center font-bold"
+                      >
+                        2
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-orange-950">
+                          Bên B: Hợp tác xã (Đầu mối)
+                        </h4>
+                        <p class="text-xs text-orange-700">
+                          Tổ chức, Kiểm soát & Xuất Hóa đơn
+                        </p>
+                      </div>
+                    </div>
+                    <ul class="text-xs text-slate-700 space-y-2 list-disc pl-4">
+                      <li>
+                        Bảo lãnh tiêu thụ, tổ chức cân đo và phân loại minh bạch
+                        L1, L2, L3.
+                      </li>
+                      <li>
+                        Phát hành hóa đơn xuất kho điện tử, gắn mã QR định danh
+                        từng kiện.
+                      </li>
+                      <li>
+                        <strong>Tạm ứng ngay 70% giá trị lô cam</strong> cho
+                        nông hộ khi tiếp nhận tại điểm tập kết.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Role 3: Doanh nghiệp -->
+                  <div
+                    class="p-5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3"
+                  >
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold"
+                      >
+                        3
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-blue-950">
+                          Bên C: Doanh nghiệp Tiêu Thụ
+                        </h4>
+                        <p class="text-xs text-blue-700">
+                          Hệ thống phân phối & Chế biến
+                        </p>
+                      </div>
+                    </div>
+                    <ul class="text-xs text-slate-700 space-y-2 list-disc pl-4">
+                      <li>
+                        Đặt hàng theo kế hoạch trước mùa thu hoạch (sản lượng,
+                        quy cách, lịch nhận).
+                      </li>
+                      <li>
+                        Áp dụng
+                        <strong
+                          >công thức giá linh hoạt có Giá Sàn bảo vệ người
+                          trồng</strong
+                        >.
+                      </li>
+                      <li>
+                        Ký quỹ đặt cọc 20% giá trị hợp đồng để đảm bảo trách
+                        nhiệm thu mua.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ==========================================
+                     TAB 4: PHÂN LOẠI SẢN PHẨM & CƠ CHẾ GIÁ MINH BẠCH
+                     ========================================== -->
+          <section id="tab-grading" class="hidden space-y-6">
+            <!-- Grading Standards & Transparent Pricing Board -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              <!-- Grade 1 Card -->
+              <div
+                class="bg-white rounded-2xl border-2 border-emerald-500/80 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden"
+              >
+                <div
+                  class="absolute top-0 right-0 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase"
+                >
+                  Phẩm cấp Cao cấp
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-black"
+                    >
+                      L1
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-slate-800 text-base">
+                        Cam Loại 1 (Tuyển chọn Siêu thị)
+                      </h4>
+                      <p class="text-xs text-emerald-700 font-semibold">
+                        Siêu thị Co.opmart, WinMart, Bách Hóa Xanh, TMĐT
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-baseline justify-between"
+                  >
+                    <span class="text-xs text-slate-600 font-medium"
+                      >Giá thu mua niêm yết:</span
+                    >
+                    <span
+                      class="text-xl font-black text-emerald-700"
+                      id="grade1PriceDisplay"
+                      >18,000 đ/kg</span
+                    >
+                  </div>
+                  <ul class="text-xs text-slate-600 space-y-1.5 pt-1">
+                    <li>
+                      <i class="fa-solid fa-check text-emerald-600 mr-1.5"></i
+                      ><strong>Trọng lượng:</strong> Từ 250g/quả trở lên (3 - 4
+                      quả/kg).
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-emerald-600 mr-1.5"></i
+                      ><strong>Hình thức:</strong> Vỏ sáng bóng, không vết bọ
+                      trĩ, cuống tươi dính liền quả.
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-emerald-600 mr-1.5"></i
+                      ><strong>Độ đường Brix:</strong> &ge; 10.5%, mọng nước,
+                      đóng hộp tem QR định danh.
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between"
+                >
+                  <span>Giá sàn bảo hiểm: <strong>14,000 đ/kg</strong></span>
+                  <span class="text-emerald-700 font-semibold"
+                    >+25% so với bán xô</span
+                  >
+                </div>
+              </div>
+
+              <!-- Grade 2 Card -->
+              <div
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden"
+              >
+                <div
+                  class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase"
+                >
+                  Phẩm cấp Phổ thông
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl font-black"
+                    >
+                      L2
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-slate-800 text-base">
+                        Cam Loại 2 (Bán buôn & Dịch vụ F&B)
+                      </h4>
+                      <p class="text-xs text-blue-700 font-semibold">
+                        Chợ đầu mối Thủ Đức, Bình Điền, Chuỗi nước giải khát
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-xl bg-blue-50 border border-blue-100 flex items-baseline justify-between"
+                  >
+                    <span class="text-xs text-slate-600 font-medium"
+                      >Giá thu mua niêm yết:</span
+                    >
+                    <span
+                      class="text-xl font-black text-blue-700"
+                      id="grade2PriceDisplay"
+                      >13,000 đ/kg</span
+                    >
+                  </div>
+                  <ul class="text-xs text-slate-600 space-y-1.5 pt-1">
+                    <li>
+                      <i class="fa-solid fa-check text-blue-600 mr-1.5"></i
+                      ><strong>Trọng lượng:</strong> Từ 180g – 249g/quả (4 - 5
+                      quả/kg).
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-blue-600 mr-1.5"></i
+                      ><strong>Hình thức:</strong> Ruột chuẩn mọng nước, vỏ có
+                      da cám nhẹ hoặc kích thước vừa.
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-blue-600 mr-1.5"></i
+                      ><strong>Đóng gói:</strong> Sọt nhựa chuẩn 20kg hoặc túi
+                      lưới nhãn mác HTX.
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between"
+                >
+                  <span>Giá sàn bảo hiểm: <strong>10,000 đ/kg</strong></span>
+                  <span class="text-blue-700 font-semibold"
+                    >Kênh tiêu thụ lớn nhất</span
+                  >
+                </div>
+              </div>
+
+              <!-- Grade 3 Card -->
+              <div
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden"
+              >
+                <div
+                  class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase"
+                >
+                  Chế biến Công nghiệp
+                </div>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-700 flex items-center justify-center text-xl font-black"
+                    >
+                      L3
+                    </div>
+                    <div>
+                      <h4 class="font-extrabold text-slate-800 text-base">
+                        Cam Loại 3 (Nguyên liệu Chế biến)
+                      </h4>
+                      <p class="text-xs text-orange-700 font-semibold">
+                        Nhà máy Nước ép, Mứt cam dẻo, Trà vỏ cam sấy
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    class="p-3 rounded-xl bg-orange-50 border border-orange-100 flex items-baseline justify-between"
+                  >
+                    <span class="text-xs text-slate-600 font-medium"
+                      >Giá thu mua niêm yết:</span
+                    >
+                    <span
+                      class="text-xl font-black text-orange-600"
+                      id="grade3PriceDisplay"
+                      >7,500 đ/kg</span
+                    >
+                  </div>
+                  <ul class="text-xs text-slate-600 space-y-1.5 pt-1">
+                    <li>
+                      <i class="fa-solid fa-check text-orange-500 mr-1.5"></i
+                      ><strong>Trọng lượng:</strong> Dưới 180g hoặc quả nhỏ, bề
+                      ngoài rám nắng.
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-orange-500 mr-1.5"></i
+                      ><strong>Chất lượng:</strong> Không bị dập thối, an toàn
+                      vệ sinh thực phẩm để trích ly dịch cam.
+                    </li>
+                    <li>
+                      <i class="fa-solid fa-check text-orange-500 mr-1.5"></i
+                      ><strong>Vai trò:</strong> Tách riêng khỏi thị trường trái
+                      tươi để tránh kéo giảm mặt bằng giá.
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between"
+                >
+                  <span>Hợp đồng nhà máy chế biến</span>
+                  <span class="text-orange-600 font-semibold"
+                    >Tận dụng 100% sản lượng</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Farmer Batch Grading & Revenue Simulator -->
+            <div
+              class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6"
+            >
+              <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4 mb-5"
+              >
+                <div>
+                  <span
+                    class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-100 text-emerald-800"
+                    >Công cụ Hạch toán Minh bạch</span
+                  >
+                  <h3 class="text-lg font-extrabold text-slate-800 mt-1">
+                    So Sánh Thu Nhập Giữa Phân Loại HTX & Bán Xô Cho Thương Lái
+                    Ngoài
+                  </h3>
+                  <p class="text-xs text-slate-500">
+                    Giúp nông hộ tính toán trực quan lợi ích kinh tế khi bán qua
+                    chuỗi HTX
+                  </p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Left Controls (7 cols) -->
+                <div class="lg:col-span-7 space-y-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-xs font-bold text-slate-700 mb-1"
+                        >Khối lượng lô cam thu hoạch (Tấn)</label
+                      >
+                      <input
+                        type="number"
+                        id="calcBatchWeight"
+                        value="25"
+                        min="1"
+                        max="500"
+                        oninput="runGradingCalculator()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-bold text-slate-700 mb-1"
+                        >Giá bán xô thương lái ngoài đưa ra (đ/kg)</label
+                      >
+                      <input
+                        type="number"
+                        id="calcUngradedPrice"
+                        value="11000"
+                        step="500"
+                        oninput="runGradingCalculator()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-600 focus:outline-none focus:border-emerald-600"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Sliders for Grade 1, 2, 3 Percentages -->
+                  <div
+                    class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3"
+                  >
+                    <div
+                      class="flex justify-between items-center text-xs font-bold"
+                    >
+                      <span class="text-slate-700"
+                        >Tỷ lệ Phân Loại Thực Tế Tại Điểm Tập Kết (Tổng =
+                        100%)</span
+                      >
+                      <span id="calcRatioWarning" class="text-emerald-700"
+                        >Đã cân bằng 100%</span
+                      >
+                    </div>
+
+                    <!-- Grade 1 Slider -->
+                    <div>
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-emerald-800"
+                          >Loại 1 (18,000 đ/kg - Siêu thị / TMĐT):</span
+                        >
+                        <span
+                          class="font-bold text-emerald-700"
+                          id="calcG1PctLabel"
+                          >50% (12.5 tấn)</span
+                        >
+                      </div>
+                      <input
+                        type="range"
+                        id="calcG1Slider"
+                        min="0"
+                        max="100"
+                        value="50"
+                        oninput="adjustGradingSliders(1)"
+                        class="w-full accent-emerald-600 cursor-pointer"
+                      />
+                    </div>
+
+                    <!-- Grade 2 Slider -->
+                    <div>
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-blue-800"
+                          >Loại 2 (13,000 đ/kg - Bán buôn / F&B):</span
+                        >
+                        <span
+                          class="font-bold text-blue-700"
+                          id="calcG2PctLabel"
+                          >35% (8.8 tấn)</span
+                        >
+                      </div>
+                      <input
+                        type="range"
+                        id="calcG2Slider"
+                        min="0"
+                        max="100"
+                        value="35"
+                        oninput="adjustGradingSliders(2)"
+                        class="w-full accent-blue-600 cursor-pointer"
+                      />
+                    </div>
+
+                    <!-- Grade 3 Auto Remainder -->
+                    <div>
+                      <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-orange-800"
+                          >Loại 3 (7,500 đ/kg - Nhà máy Chế biến):</span
+                        >
+                        <span
+                          class="font-bold text-orange-600"
+                          id="calcG3PctLabel"
+                          >15% (3.8 tấn)</span
+                        >
+                      </div>
+                      <div
+                        class="w-full bg-slate-200 h-2 rounded-full overflow-hidden"
+                      >
+                        <div
+                          id="calcG3Bar"
+                          class="bg-orange-500 h-2 rounded-full"
+                          style="width: 15%"
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Result Box (5 cols) -->
+                <div
+                  class="lg:col-span-5 bg-gradient-to-br from-emerald-900 to-emerald-950 text-white rounded-2xl p-5 sm:p-6 space-y-4 shadow-lg"
+                >
+                  <div
+                    class="flex items-center justify-between border-b border-emerald-800 pb-3"
+                  >
+                    <span
+                      class="text-xs font-semibold uppercase tracking-wider text-emerald-300"
+                      >Hạch toán Minh bạch HTX</span
+                    >
+                    <span
+                      class="px-2 py-0.5 rounded bg-orange-500 text-white text-[10px] font-bold"
+                      >Cam kết chi trả</span
+                    >
+                  </div>
+
+                  <div>
+                    <div class="text-xs text-emerald-200">
+                      Tổng thu nhập qua HTX phân loại:
+                    </div>
+                    <div
+                      class="text-2xl sm:text-3xl font-black text-white mt-0.5"
+                      id="calcTotalGradedRevenue"
+                    >
+                      366,875,000 đ
+                    </div>
+                    <div
+                      class="text-xs text-emerald-300 mt-1"
+                      id="calcAveragePriceText"
+                    >
+                      Giá bình quân đạt: <strong>14,675 đ/kg</strong>
+                    </div>
+                  </div>
+
+                  <div
+                    class="p-3.5 rounded-xl bg-emerald-800/60 border border-emerald-700/80 space-y-1.5 text-xs"
+                  >
+                    <div class="flex justify-between">
+                      <span class="text-emerald-200">Nếu bán xô cào bằng:</span>
+                      <span
+                        class="font-semibold text-slate-200"
+                        id="calcUngradedRevenue"
+                        >275,000,000 đ</span
+                      >
+                    </div>
+                    <div
+                      class="flex justify-between text-orange-300 font-bold pt-1 border-t border-emerald-700"
+                    >
+                      <span>Giá trị gia tăng nhờ chuỗi HTX:</span>
+                      <span id="calcValueAdded">+91,875,000 đ (+33.4%)</span>
+                    </div>
+                  </div>
+
+                  <div class="space-y-1 text-[11px] text-emerald-200">
+                    <div class="font-bold text-white mb-1">
+                      <i class="fa-solid fa-route mr-1 text-orange-400"></i>Điều
+                      phối kênh tiêu thụ tối ưu:
+                    </div>
+                    <div id="calcChannelAllocationSuggestion" class="space-y-1">
+                      <!-- Populated via JS -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ==========================================
+                     TAB 5: KHO BẢO QUẢN ĐỆM & TRUY XUẤT QR & HÓA ĐƠN
+                     ========================================== -->
+          <section id="tab-logistics" class="hidden space-y-6">
+            <!-- Centralized Collection Points & Short-term Buffer Storage -->
+            <div
+              class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 space-y-5"
+            >
+              <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4"
+              >
+                <div>
+                  <span
+                    class="px-2.5 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-800"
+                    >Khoảng Đệm Điều Tiết Thu Hoạch</span
+                  >
+                  <h3 class="text-lg font-extrabold text-slate-800 mt-1">
+                    Mạng Lưới Điểm Tập Kết & Kho Mát Dùng Chung ĐBSCL
+                  </h3>
+                  <p class="text-xs text-slate-500">
+                    Đóng vai trò "khoảng đệm" lưu trữ ngắn hạn tối đa 3-5 ngày
+                    trong thời điểm cắt rộ, kết nối với dữ liệu mã vùng trồng
+                    (PUC) và phát hành hóa đơn xuất hàng.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-1 md:grid-cols-3 gap-4"
+                id="storageHubsContainer"
+              >
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <!-- Traceability & Lot Transport Coordination -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <!-- Left 7 Cols: Batch Traceability & Transport List with Invoices -->
+              <div
+                class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 space-y-4"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h4 class="font-bold text-slate-800 text-base">
+                      Nhật Ký Lô Hàng Xuất Kho & Vận Chuyển
+                    </h4>
+                    <p class="text-xs text-slate-500">
+                      Chọn lô hàng hoặc bấm Hóa đơn để mở Hộ chiếu Nông sản &
+                      Chứng từ điện tử
+                    </p>
+                  </div>
+                  <span
+                    class="px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600"
+                    id="lotsCounterDisplay"
+                    >3 lô hàng</span
+                  >
+                </div>
+
+                <div class="space-y-3" id="traceabilityLotsList">
+                  <!-- Populated via JS -->
+                </div>
+              </div>
+
+              <!-- Right 5 Cols: Interactive QR Traceability Passport & Invoice View -->
+              <div
+                class="lg:col-span-5 bg-white rounded-2xl border-2 border-emerald-600/80 shadow-md p-5 sm:p-6 space-y-4"
+                id="qrPassportCard"
+              >
+                <!-- Populated via JS -->
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ==========================================
+         MODALS FOR INTERACTIVE ACTIONS
+         ========================================== -->
+    <!-- MODAL: GHI NHẬN THU HOẠCH & NHẬP SỐ LƯỢNG (HARVEST MODAL) -->
+    <div
+      id="harvestModal"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden"
+      >
+        <div
+          class="bg-gradient-to-r from-emerald-700 to-teal-800 px-6 py-4 text-white flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-bold text-base flex items-center gap-2">
+              <i class="fa-solid fa-lemon text-orange-300"></i>
+              <span>Ghi Nhận Sản Lượng Thu Hoạch</span>
+            </h3>
+            <p class="text-xs text-emerald-200">
+              Nhập khối lượng cam thực tế hái từ vườn để nhập kho đệm
+            </p>
+          </div>
+          <button
+            type="button"
+            onclick="closeHarvestModal()"
+            class="text-emerald-200 hover:text-white"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form onsubmit="submitHarvestForm(event)" class="p-6 space-y-4 text-sm">
+          <!-- Thẻ tóm tắt thông tin hộ -->
+          <div
+            class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2"
+          >
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-500 uppercase"
+                >Mã hộ / Vùng trồng (PUC):</span
+              >
+              <span
+                class="font-mono font-bold text-emerald-800"
+                id="harvModalFarmerCode"
+                >NH-VL-01 • VL-TO-001</span
+              >
+            </div>
+            <div>
+              <div class="text-xs text-slate-500">Chủ hộ:</div>
+              <div
+                class="font-extrabold text-slate-800 text-sm"
+                id="harvModalFarmerName"
+              >
+                Nguyễn Văn Mười
+              </div>
+            </div>
+            <div
+              class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-center"
+            >
+              <div>
+                <div class="text-[11px] text-slate-500">Dự kiến cả vụ:</div>
+                <div
+                  class="font-extrabold text-slate-800"
+                  id="harvModalExpectedTons"
+                >
+                  160 tấn
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-slate-500">Đã hái:</div>
+                <div
+                  class="font-extrabold text-blue-700"
+                  id="harvModalActualTons"
+                >
+                  60 tấn
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-slate-500">Còn trên cây:</div>
+                <div
+                  class="font-extrabold text-orange-600"
+                  id="harvModalRemainingTons"
+                >
+                  100 tấn
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ô nhập số lượng & ngày -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Khối lượng thu hoạch lần này (Tấn) *</label
+              >
+              <input
+                type="number"
+                id="harvInputTons"
+                required
+                min="0.1"
+                step="0.1"
+                placeholder="Nhập số tấn (VD: 15.5)"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold text-emerald-700 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Ngày thu hoạch *</label
+              >
+              <input
+                type="date"
+                id="harvInputDate"
+                required
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <!-- Chọn Kho tiếp nhận -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1"
+              >Kho đệm tiếp nhận lưu trữ *</label
+            >
+            <select
+              id="harvInputHub"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+            ></select>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onclick="closeHarvestModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+            >
+              Đóng
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-xl green-gradient text-white font-bold shadow hover:opacity-95"
+            >
+              Xác Nhận Nhập Kho
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- MODAL: CONFIRM & UPDATE DELIVERY & GENERATE INVOICE -->
+    <div
+      id="deliveryModal"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col"
+      >
+        <div
+          class="bg-gradient-to-r from-emerald-700 to-teal-800 px-6 py-4 text-white flex items-center justify-between shrink-0"
+        >
+          <div>
+            <h3 class="font-bold text-base flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+              <span>Xác Nhận Xuất Hàng & Lập Hóa Đơn Điện Tử</span>
+            </h3>
+            <p class="text-xs text-emerald-200">
+              Ghi nhận sản lượng cam xuất kho và tự động cấp Hóa đơn điện tử
+            </p>
+          </div>
+          <button
+            onclick="closeDeliveryModal()"
+            class="text-emerald-200 hover:text-white"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form
+          onsubmit="submitDeliveryUpdate(event)"
+          class="p-6 space-y-4 text-sm overflow-y-auto"
+        >
+          <!-- Order Summary Display -->
+          <div
+            class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2"
+          >
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-500 uppercase"
+                >Mã hợp đồng:</span
+              >
+              <span
+                class="font-mono font-bold text-slate-800"
+                id="delModalOrderId"
+                >HD-3B-101</span
+              >
+            </div>
+            <div>
+              <div class="text-xs text-slate-500">Đối tác nhận hàng:</div>
+              <div
+                class="font-extrabold text-slate-800 text-sm"
+                id="delModalPartnerName"
+              >
+                Hệ thống Siêu thị Co.opmart & WinMart
+              </div>
+            </div>
+            <div
+              class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-200 text-center"
+            >
+              <div>
+                <div class="text-[11px] text-slate-500">Tổng đặt:</div>
+                <div
+                  class="font-extrabold text-slate-800"
+                  id="delModalTotalTons"
+                >
+                  180 tấn
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-slate-500">Đã giao:</div>
+                <div
+                  class="font-extrabold text-blue-700"
+                  id="delModalDeliveredTons"
+                >
+                  75 tấn
+                </div>
+              </div>
+              <div>
+                <div class="text-[11px] text-slate-500">Còn lại:</div>
+                <div
+                  class="font-extrabold text-orange-600"
+                  id="delModalRemainingTons"
+                >
+                  105 tấn
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Khối lượng giao đợt này (Tấn) *</label
+              >
+              <input
+                type="number"
+                id="delInputTons"
+                required
+                min="0.5"
+                step="0.5"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold text-emerald-700 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Ngày xuất hàng *</label
+              >
+              <input
+                type="date"
+                id="delInputDate"
+                required
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Mã Hóa đơn điện tử dự kiến</label
+              >
+              <input
+                type="text"
+                id="delInputInvoiceId"
+                readonly
+                class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 text-blue-700 font-mono font-bold"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Đơn giá hạch toán (đ/kg)</label
+              >
+              <input
+                type="number"
+                id="delInputUnitPrice"
+                value="18000"
+                step="500"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold text-slate-800 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Kho xuất hàng *</label
+              >
+              <select
+                id="delInputHub"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              >
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Biển số xe vận chuyển *</label
+              >
+              <input
+                type="text"
+                id="delInputVehicle"
+                required
+                placeholder="VD: 64C-092.15"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1"
+              >Mã vùng trồng (PUC) xuất cho đơn này *</label
+            >
+            <select
+              id="delInputPucCode"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-600"
+            >
+              <!-- Populated via JS with active farmers -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1"
+              >Ghi chú kiểm nghiệm & Chứng từ</label
+            >
+            <input
+              type="text"
+              id="delInputNote"
+              placeholder="Đạt chuẩn kiểm nghiệm dư lượng, đóng thùng tem QR định danh"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+            />
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onclick="closeDeliveryModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+            >
+              Đóng
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-xl green-gradient text-white font-bold shadow hover:opacity-95"
+            >
+              <i class="fa-solid fa-file-invoice mr-1.5"></i>Phát Hành Hóa Đơn &
+              Xuất Kho
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 1: ADD / EDIT FARMER WITH EDITABLE PUC AREA CODE -->
+    <div
+      id="farmerModal"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col"
+      >
+        <div
+          class="green-gradient px-6 py-4 text-white flex items-center justify-between shrink-0"
+        >
+          <div>
+            <h3 class="font-bold text-base">
+              Đăng ký Nông hộ & Cấp Mã Vùng Trồng (PUC)
+            </h3>
+            <p class="text-xs text-emerald-200">
+              Chuẩn hóa mã số vùng trồng phục vụ kiểm tra và xuất khẩu
+            </p>
+          </div>
+          <button
+            onclick="closeFarmerModal()"
+            class="text-emerald-200 hover:text-white"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <form
+          onsubmit="saveFarmerForm(event)"
+          class="p-6 space-y-4 text-sm overflow-y-auto"
+        >
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Họ tên Chủ hộ *</label
+              >
+              <input
+                type="text"
+                id="fmName"
+                required
+                placeholder="VD: Trần Văn Khải"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Tỉnh / Thành phố ĐBSCL *</label
+              >
+              <select
+                id="fmProvince"
+                onchange="onProvinceChangedInModal()"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              >
+                <option value="Vĩnh Long">Vĩnh Long</option>
+                <option value="Hậu Giang">Hậu Giang</option>
+                <option value="Tiền Giang">Tiền Giang</option>
+                <option value="Bến Tre">Bến Tre</option>
+                <option value="Sóc Trăng">Sóc Trăng</option>
+                <option value="Cần Thơ">TP. Cần Thơ</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- EDITABLE PUC FIELD (REQUIREMENT #1) -->
+          <div
+            class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1.5"
+          >
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-emerald-950">
+                <i class="fa-solid fa-barcode mr-1 text-emerald-700"></i>Mã Vùng
+                Trồng (Mã số PUC) *
+              </label>
+              <button
+                type="button"
+                onclick="regenerateSuggestedPuc()"
+                class="text-[11px] font-bold text-emerald-700 underline hover:text-emerald-900"
+              >
+                Tạo gợi ý mới
+              </button>
+            </div>
+            <input
+              type="text"
+              id="fmOrchardCode"
+              required
+              placeholder="VD: VN-VLOT-015 hoặc VL-TO-015"
+              class="w-full px-3 py-2 rounded-xl border border-emerald-300 bg-white font-mono font-bold text-emerald-900 focus:outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-500"
+            />
+            <p class="text-[11px] text-emerald-700 leading-tight">
+              Bạn có thể nhập trực tiếp Mã số PUC thực tế đã được cấp bởi Chi
+              cục Trồng trọt & BVTV, hoặc sử dụng mã gợi ý theo chuẩn của HTX.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Huyện / Xã vùng trồng *</label
+              >
+              <input
+                type="text"
+                id="fmZoneDistrict"
+                required
+                placeholder="VD: Tam Bình - Xã Loan Mỹ"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Số điện thoại liên hệ *</label
+              >
+              <input
+                type="text"
+                id="fmPhone"
+                required
+                placeholder="0918.xxx.xxx"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Diện tích (ha) *</label
+              >
+              <input
+                type="number"
+                step="0.5"
+                min="0.5"
+                id="fmArea"
+                required
+                placeholder="8.5"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >SL dự kiến (Tấn) *</label
+              >
+              <input
+                type="number"
+                step="1"
+                min="0"
+                id="fmExpected"
+                required
+                placeholder="120"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Đã hái (Tấn)</label
+              >
+              <input
+                type="number"
+                step="1"
+                min="0"
+                id="fmActual"
+                value="0"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Tiêu chuẩn canh tác</label
+              >
+              <select
+                id="fmStandard"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              >
+                <option value="VietGAP">Đạt chuẩn VietGAP</option>
+                <option value="GlobalGAP">Đạt chuẩn GlobalGAP</option>
+                <option value="Hữu cơ">Hướng Hữu cơ</option>
+                <option value="An toàn">Quy trình An toàn HTX</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Thời gian thu hoạch</label
+              >
+              <input
+                type="date"
+                id="fmHarvestWeek"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-emerald-600"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onclick="closeFarmerModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-xl green-gradient text-white font-bold shadow"
+            >
+              <i class="fa-solid fa-floppy-disk mr-1.5"></i>Lưu & Cấp Mã Vùng
+              Trồng
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 2: ADD ENTERPRISE ORDER -->
+    <div
+      id="orderModal"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden"
+      >
+        <div
+          class="orange-gradient px-6 py-4 text-white flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-bold text-base">
+              Tạo Hợp Đồng Bao Tiêu / Đơn Đặt Mua
+            </h3>
+            <p class="text-xs text-orange-100">
+              Khóa sản lượng trước mùa vụ giúp điều phối giá hiệu quả
+            </p>
+          </div>
+          <button
+            onclick="closeOrderModal()"
+            class="text-orange-100 hover:text-white"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <form onsubmit="saveOrderForm(event)" class="p-6 space-y-4 text-sm">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1"
+              >Tên Doanh nghiệp / Đối tác Tiêu thụ *</label
+            >
+            <input
+              type="text"
+              id="ordPartnerName"
+              required
+              placeholder="VD: Tập đoàn Bán lẻ Central Retail / Lotte Mart..."
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:border-orange-500"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Kênh Phân Phối *</label
+              >
+              <select
+                id="ordChannelType"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-orange-500"
+              >
+                <option value="Siêu thị & Bán lẻ hiện đại">
+                  Siêu thị & Cửa hàng trái cây sạch
+                </option>
+                <option value="Chế biến sâu (Nước ép/Mứt/Sấy)">
+                  Nhà máy chế biến sâu (Nước ép, mứt, sấy)
+                </option>
+                <option value="Thương mại điện tử & Chuỗi F&B">
+                  Sàn TMĐT OCOP & Chuỗi F&B đồ uống
+                </option>
+                <option value="Chợ đầu mối & Thương lái đối tác">
+                  Chợ đầu mối & Thương lái đối tác HTX
+                </option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Phẩm cấp yêu cầu *</label
+              >
+              <select
+                id="ordGradeReq"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-orange-500"
+              >
+                <option value="Loại 1 (Cao cấp >250g)">
+                  Loại 1 (Cao cấp >250g, VietGAP)
+                </option>
+                <option value="Loại 2 (Tiêu chuẩn 180-250g)">
+                  Loại 2 (Tiêu chuẩn 180-250g)
+                </option>
+                <option value="Loại 3 (Nguyên liệu chế biến)">
+                  Loại 3 (Nguyên liệu chế biến)
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Sản lượng đặt mua (Tấn) *</label
+              >
+              <input
+                type="number"
+                id="ordVolume"
+                required
+                min="10"
+                max="2000"
+                value="80"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold text-orange-600 focus:outline-none focus:border-orange-500"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1"
+                >Cơ chế Giá & Thanh toán</label
+              >
+              <select
+                id="ordPricingRule"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:border-orange-500"
+              >
+                <option value="Giá niêm yết HTX + Bảo hiểm giá sàn">
+                  Giá niêm yết HTX + Bảo hiểm giá sàn
+                </option>
+                <option value="Giá cố định theo hợp đồng">
+                  Giá cố định theo hợp đồng vụ
+                </option>
+                <option value="Cập nhật định kỳ 7 ngày (Cọc 20%)">
+                  Cập nhật định kỳ 7 ngày (Cọc 20%)
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            class="p-3 rounded-xl bg-orange-50 border border-orange-200 text-xs text-orange-900"
+          >
+            <i class="fa-solid fa-circle-check mr-1 text-orange-600"></i>
+            Đơn hàng sẽ tự động giảm trừ khối lượng cần tìm đầu ra trên biểu đồ
+            cân đối cung cầu.
+          </div>
+
+          <div class="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onclick="closeOrderModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-xl orange-gradient text-white font-bold shadow"
+            >
+              Ký Hợp Đồng & Phân Bổ
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL 3: QUICK ALLOCATE SUPPLEMENTARY CHANNELS -->
+    <div
+      id="supplementaryModal"
+      class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4"
+    >
+      <div
+        class="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden"
+      >
+        <div
+          class="bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-4 text-white flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-bold text-base">Kích hoạt Kênh Tiêu thụ Bổ sung</h3>
+            <p class="text-xs text-orange-100">
+              Điều phối khối lượng cam dự kiến chưa có hợp đồng bao tiêu
+            </p>
+          </div>
+          <button
+            onclick="closeSupplementaryChannelModal()"
+            class="text-orange-100 hover:text-white"
+          >
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <div class="p-6 space-y-4 text-sm">
+          <div
+            class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-between"
+          >
+            <div>
+              <div class="text-xs text-amber-800 font-medium">
+                Sản lượng cam cần tìm đầu ra bổ sung:
+              </div>
+              <div
+                class="text-xl font-black text-orange-600"
+                id="suppModalRemainingText"
+              >
+                340 tấn
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-lg bg-white border border-amber-300 text-xs font-bold text-amber-900"
+            >
+              Chủ động trước mùa hái rộ
+            </span>
+          </div>
+
+          <p class="text-xs text-slate-600">
+            Lựa chọn phương án kích hoạt nhanh để giải tỏa áp lực tiêu thụ theo
+            từng nhóm phẩm cấp:
+          </p>
+
+          <div class="space-y-2.5">
+            <!-- Option 1: Processing Plant -->
+            <div
+              class="p-3.5 rounded-xl border border-slate-200 hover:border-orange-400 bg-slate-50/70 flex items-center justify-between gap-3"
+            >
+              <div>
+                <div class="font-bold text-slate-800">
+                  1. Chuyển 150 tấn Cam Loại 3 sang Nhà máy Nước ép & Sấy Mứt
+                  ĐBSCL
+                </div>
+                <div class="text-xs text-slate-500">
+                  Đối tác: Công ty CP Chế biến Nông sản Hậu Giang (Ép dịch vô
+                  trùng đóng lon)
+                </div>
+              </div>
+              <button
+                onclick="
+                  allocateSurplusQuick(
+                    'Công ty CP Chế biến Nông sản Hậu Giang (Bổ sung)',
+                    'Chế biến sâu (Nước ép/Mứt/Sấy)',
+                    'Loại 3 (Nguyên liệu chế biến)',
+                    150,
+                  )
+                "
+                class="px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shrink-0"
+              >
+                Phân bổ 150 tấn
+              </button>
+            </div>
+
+            <!-- Option 2: E-Commerce & Livestream OCOP -->
+            <div
+              class="p-3.5 rounded-xl border border-slate-200 hover:border-emerald-400 bg-slate-50/70 flex items-center justify-between gap-3"
+            >
+              <div>
+                <div class="font-bold text-slate-800">
+                  2. Kết nối 100 tấn Cam Loại 1 & 2 lên Gian hàng OCOP Sàn TMĐT
+                  & Chuỗi F&B
+                </div>
+                <div class="text-xs text-slate-500">
+                  Đối tác: Hệ thống Bán lẻ Trực tuyến & Chuỗi Quán Trà Trái Cây
+                  TP.HCM / Cần Thơ
+                </div>
+              </div>
+              <button
+                onclick="
+                  allocateSurplusQuick(
+                    'Tổ hợp Sàn TMĐT OCOP & Chuỗi Đồ uống F&B',
+                    'Thương mại điện tử & Chuỗi F&B',
+                    'Loại 1 & 2 (Hộp 5kg có QR)',
+                    100,
+                  )
+                "
+                class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shrink-0"
+              >
+                Phân bổ 100 tấn
+              </button>
+            </div>
+
+            <!-- Option 3: Managed Traders & Wholesale -->
+            <div
+              class="p-3.5 rounded-xl border border-slate-200 hover:border-blue-400 bg-slate-50/70 flex items-center justify-between gap-3"
+            >
+              <div>
+                <div class="font-bold text-slate-800">
+                  3. Điều phối 90 tấn Cam Loại 2 sang Mạng lưới Thương lái Đối
+                  tác HTX
+                </div>
+                <div class="text-xs text-slate-500">
+                  Đối tác: Liên hiệp Vận chuyển Sông Tiền - Chợ Đầu Mối Bình
+                  Điền
+                </div>
+              </div>
+              <button
+                onclick="
+                  allocateSurplusQuick(
+                    'Liên hiệp Vận chuyển Sông Tiền - Chợ Bình Điền',
+                    'Chợ đầu mối & Thương lái đối tác',
+                    'Loại 2 (Tiêu chuẩn 180-250g)',
+                    90,
+                  )
+                "
+                class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shrink-0"
+              >
+                Phân bổ 90 tấn
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button
+              onclick="closeSupplementaryChannelModal()"
+              class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+            >
+              Đóng cửa sổ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC & APPLICATION STATE
+         ========================================== -->
+    <script>
+      // --- 1. EXPANDED REGIONAL DATA MODEL (MEKONG DELTA REGION) ---
+      let farmersData = [
+        // VĨNH LONG
+        {
+          id: "NH-VL-01",
+          orchardCode: "VN-VLOT-001", // Standard PUC Format
+          name: "Nguyễn Văn Mười",
+          phone: "0913.452.118",
+          province: "Vĩnh Long",
+          zone: "Huyện Trà Ôn (Xã Hựu Thành)",
+          area: 10.5,
+          expectedTons: 160,
+          actualTons: 60,
+          harvestWeek: "Tuần 1 (01-07/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "55% L1 - 35% L2 - 10% L3",
+        },
+        {
+          id: "NH-VL-02",
+          orchardCode: "VN-VLTB-002",
+          name: "Lê Hoàng Nam",
+          phone: "0907.881.334",
+          province: "Vĩnh Long",
+          zone: "Huyện Tam Bình (Xã Hòa Thạnh)",
+          area: 12.0,
+          expectedTons: 180,
+          actualTons: 70,
+          harvestWeek: "Tuần 2 (08-15/11)",
+          standard: "GlobalGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "65% L1 - 25% L2 - 10% L3",
+        },
+        {
+          id: "NH-VL-03",
+          orchardCode: "VN-VLVL-003",
+          name: "Võ Thành Đạt",
+          phone: "0918.765.902",
+          province: "Vĩnh Long",
+          zone: "Huyện Vũng Liêm (Xã Hiếu Nghĩa)",
+          area: 8.5,
+          expectedTons: 130,
+          actualTons: 40,
+          harvestWeek: "Tuần 3 (16-23/11)",
+          standard: "Hữu cơ",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "60% L1 - 30% L2 - 10% L3",
+        },
+        {
+          id: "NH-VL-04",
+          orchardCode: "VN-VLBM-004",
+          name: "Huỳnh Văn Sơn",
+          phone: "0945.601.228",
+          province: "Vĩnh Long",
+          zone: "TX. Bình Minh (Xã Đông Bình)",
+          area: 6.5,
+          expectedTons: 90,
+          actualTons: 25,
+          harvestWeek: "Tuần 4 (24-30/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "50% L1 - 35% L2 - 15% L3",
+        },
+
+        // HẬU GIANG (Châu Thành, Phụng Hiệp)
+        {
+          id: "NH-HG-05",
+          orchardCode: "VN-HGCT-005",
+          name: "Trần Văn Khải",
+          phone: "0939.221.780",
+          province: "Hậu Giang",
+          zone: "Huyện Châu Thành (Xã Đông Phú)",
+          area: 14.0,
+          expectedTons: 210,
+          actualTons: 75,
+          harvestWeek: "Tuần 1 (01-07/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "50% L1 - 40% L2 - 10% L3",
+        },
+        {
+          id: "NH-HG-06",
+          orchardCode: "VN-HGPH-006",
+          name: "Phan Thanh Tùng",
+          phone: "0987.334.129",
+          province: "Hậu Giang",
+          zone: "Huyện Phụng Hiệp (Xã Tân Bình)",
+          area: 9.5,
+          expectedTons: 135,
+          actualTons: 35,
+          harvestWeek: "Tuần 3 (16-23/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "45% L1 - 40% L2 - 15% L3",
+        },
+
+        // TIỀN GIANG (Cái Bè, Cai Lậy)
+        {
+          id: "NH-TG-07",
+          orchardCode: "VN-TGCB-007",
+          name: "Nguyễn Minh Trí",
+          phone: "0912.889.441",
+          province: "Tiền Giang",
+          zone: "Huyện Cái Bè (Xã Hậu Mỹ Bắc)",
+          area: 11.5,
+          expectedTons: 165,
+          actualTons: 50,
+          harvestWeek: "Tuần 2 (08-15/11)",
+          standard: "GlobalGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "60% L1 - 30% L2 - 10% L3",
+        },
+        {
+          id: "NH-TG-08",
+          orchardCode: "VN-TGCL-008",
+          name: "Bùi Hữu Tài",
+          phone: "0903.771.556",
+          province: "Tiền Giang",
+          zone: "Huyện Cai Lậy (Xã Long Trung)",
+          area: 7.0,
+          expectedTons: 95,
+          actualTons: 30,
+          harvestWeek: "Tuần 4 (24-30/11)",
+          standard: "An toàn",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "40% L1 - 45% L2 - 15% L3",
+        },
+
+        // BẾN TRE (Chợ Lách)
+        {
+          id: "NH-BT-09",
+          orchardCode: "VN-BTCL-009",
+          name: "Lê Văn Hưng",
+          phone: "0978.112.909",
+          province: "Bến Tre",
+          zone: "Huyện Chợ Lách (Xã Sơn Định)",
+          area: 8.0,
+          expectedTons: 115,
+          actualTons: 40,
+          harvestWeek: "Tuần 1 (01-07/11)",
+          standard: "Hữu cơ",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "65% L1 - 25% L2 - 10% L3",
+        },
+
+        // SÓC TRĂNG (Kế Sách)
+        {
+          id: "NH-ST-10",
+          orchardCode: "VN-STKS-010",
+          name: "Đỗ Quốc Việt",
+          phone: "0944.550.218",
+          province: "Sóc Trăng",
+          zone: "Huyện Kế Sách (Xã Phong Nẫm)",
+          area: 12.5,
+          expectedTons: 175,
+          actualTons: 45,
+          harvestWeek: "Tuần 2 (08-15/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "50% L1 - 35% L2 - 15% L3",
+        },
+
+        // CẦN THƠ (Phong Điền)
+        {
+          id: "NH-CT-11",
+          orchardCode: "VN-CTPD-011",
+          name: "Ngô Văn Sang",
+          phone: "0932.188.665",
+          province: "Cần Thơ",
+          zone: "Huyện Phong Điền (Xã Nhơn Ái)",
+          area: 7.0,
+          expectedTons: 100,
+          actualTons: 35,
+          harvestWeek: "Tuần 3 (16-23/11)",
+          standard: "VietGAP",
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "55% L1 - 35% L2 - 10% L3",
+        },
+        {
+          id: "NH-VL-12",
+          orchardCode: "VN-VLTO-012",
+          name: "Bùi Thị Kim Liên",
+          phone: "0962.908.411",
+          province: "Vĩnh Long",
+          zone: "Huyện Trà Ôn (Xã Tân Mỹ)",
+          area: 6.0,
+          expectedTons: 80,
+          actualTons: 15,
+          harvestWeek: "Tuần 4 (24-30/11)",
+          standard: "An toàn",
+          contractStatus: "Đang thẩm định vùng",
+          gradeRatio: "35% L1 - 45% L2 - 20% L3",
+        },
+      ];
+
+      // Enterprise & Partner Orders with Interactive Invoices Attached
+      let enterpriseOrders = [
+        {
+          id: "HD-3B-101",
+          partnerName: "Hệ thống Siêu thị Co.opmart & WinMart",
+          channelType: "Siêu thị & Bán lẻ hiện đại",
+          gradeReq: "Loại 1 (Cao cấp >250g, VietGAP)",
+          contractedTons: 320,
+          deliveredTons: 150,
+          priceRule: "18,000 đ/kg (Bảo hiểm giá sàn 14,000đ)",
+          unitPrice: 18000,
+          paymentTerm: "Thanh toán 100% sau 5 ngày đối soát",
+          schedule: "Giao định kỳ Thứ 2 - 4 - 6 hàng tuần",
+          lastDelivery: "23/10/2026",
+          status: "Đang thực hiện giao",
+          invoices: ["HDXK-101-01", "HDXK-101-02"],
+        },
+        {
+          id: "HD-3B-102",
+          partnerName: "Chuỗi Bách Hóa Xanh & KingFoodmart",
+          channelType: "Siêu thị & Bán lẻ hiện đại",
+          gradeReq: "Loại 1 & Loại 2 tuyển chọn",
+          contractedTons: 260,
+          deliveredTons: 110,
+          priceRule: "16,500 đ/kg (Điều chỉnh định kỳ 7 ngày)",
+          unitPrice: 16500,
+          paymentTerm: "Tạm ứng 30%, quyết toán theo tuần",
+          schedule: "Giao nhận mỗi sáng tại điểm tập kết",
+          lastDelivery: "22/10/2026",
+          status: "Đang thực hiện giao",
+          invoices: ["HDXK-102-01"],
+        },
+        {
+          id: "HD-3B-103",
+          partnerName: "Nhà máy Chế biến Nông sản ĐBSCL Food",
+          channelType: "Chế biến sâu (Nước ép/Mứt/Sấy)",
+          gradeReq: "Loại 3 (Ép nước tiệt trùng, mứt sấy dẻo)",
+          contractedTons: 240,
+          deliveredTons: 95,
+          priceRule: "7,500 đ/kg (Cố định suốt vụ thu hoạch)",
+          unitPrice: 7500,
+          paymentTerm: "Thanh toán trong 24 giờ sau khi cân xe",
+          schedule: "Tiếp nhận 4 chuyến xe tải lạnh/tuần",
+          lastDelivery: "21/10/2026",
+          status: "Đang thực hiện giao",
+          invoices: ["HDXK-103-01"],
+        },
+        {
+          id: "HD-3B-104",
+          partnerName: "Hợp tác Thương lái Chợ Đầu Mối Thủ Đức",
+          channelType: "Chợ đầu mối & Thương lái đối tác",
+          gradeReq: "Loại 2 (Tiêu chuẩn 180-250g)",
+          contractedTons: 250,
+          deliveredTons: 250,
+          priceRule: "13,000 đ/kg (Biên độ linh hoạt theo phiên)",
+          unitPrice: 13000,
+          paymentTerm: "Thanh toán dứt điểm khi hạ hàng",
+          schedule: "Vận chuyển ban đêm xe tải lớn 15 tấn",
+          lastDelivery: "20/10/2026",
+          status: "Đã hoàn thành 100%",
+          invoices: ["HDXK-104-01"],
+        },
+        {
+          id: "HD-3B-105",
+          partnerName: "Chuỗi Đồ Uống F&B & Sàn TMĐT OCOP Việt",
+          channelType: "Thương mại điện tử & Chuỗi F&B",
+          gradeReq: "Loại 1 & Loại 2 (Thùng giấy 5kg có mã QR)",
+          contractedTons: 170,
+          deliveredTons: 85,
+          priceRule: "15,500 đ/kg (Bao gồm chi phí đóng gói QR)",
+          unitPrice: 15500,
+          paymentTerm: "Thanh toán tự động qua tài khoản HTX",
+          schedule: "Đóng gói & xuất kho hàng ngày",
+          lastDelivery: "23/10/2026",
+          status: "Đang thực hiện giao",
+          invoices: [],
+        },
+      ];
+
+      // Managed Regional Traders
+      let managedTraders = [
+        {
+          id: "TL-HTX-01",
+          name: "Đội Vận Chuyển Thương Lái Chín Thành",
+          leader: "Ông Nguyễn Văn Thành",
+          phone: "0919.332.880",
+          assignedZone: "Tuyến sông Trà Ôn - Tam Bình (Vĩnh Long)",
+          quotaTons: 120,
+          transport: "2 Ghe tải 30 tấn + 2 Xe tải 8 tấn",
+          commission: "Phí điều phối vận tải: 650 đ/kg",
+          compliance: "Tuân thủ 100% bảng giá niêm yết HTX",
+        },
+        {
+          id: "TL-HTX-02",
+          name: "Tổ Thu Gom Sông Hậu - Châu Thành",
+          leader: "Bà Lê Thị Kim Hoa",
+          phone: "0908.415.772",
+          assignedZone: "Vùng kênh rạch Châu Thành - Phụng Hiệp (Hậu Giang)",
+          quotaTons: 110,
+          transport: "3 Ghe trung chuyển 20 tấn máy lạnh",
+          commission: "Phí điều phối vận tải: 600 đ/kg",
+          compliance: "Tuân thủ 100% bảng giá niêm yết HTX",
+        },
+        {
+          id: "TL-HTX-03",
+          name: "Đoàn Vận Tải Sông Tiền - Cái Bè",
+          leader: "Ông Trần Quốc Tuấn",
+          phone: "0983.551.104",
+          assignedZone: "Huyện Cái Bè & Chợ Lách (Tiền Giang - Bến Tre)",
+          quotaTons: 95,
+          transport: "2 Xe tải thùng lạnh 10 tấn",
+          commission: "Phí điều phối vận tải: 700 đ/kg",
+          compliance: "Ký quỹ bảo lãnh và cam kết không ép giá",
+        },
+      ];
+
+      // Regional Storage Hubs
+      let storageHubs = [
+        {
+          id: "KHO-VL-01",
+          name: "Kho Đệm Trung Tâm Vĩnh Long (Trà Ôn)",
+          location: "Cụm kho ấp Vĩnh Lợi, TT. Trà Ôn, Tỉnh Vĩnh Long",
+          capacityTons: 160,
+          currentTons: 105,
+          bufferDaysAvg: 2.5,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho mát thông gió tự nhiên 18°C - 22°C",
+          functions:
+            "Cân điện tử, Rửa ozone, Phân loại máy 3 cỡ, Đóng thùng QR",
+          status: "Vận hành tối ưu",
+        },
+        {
+          id: "KHO-VL-02",
+          name: "Kho Điểm Tập Kết Tam Bình (Vĩnh Long)",
+          location: "Xã Hòa Thạnh, Huyện Tam Bình, Tỉnh Vĩnh Long",
+          capacityTons: 130,
+          currentTons: 70,
+          bufferDaysAvg: 2.0,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho mát thông gió độ ẩm 85%",
+          functions: "Cân điện tử, Phân loại L1/L2/L3, Trung chuyển",
+          status: "Vận hành tối ưu",
+        },
+        {
+          id: "KHO-VL-03",
+          name: "Kho Bảo Quản Vũng Liêm & Cù Lao",
+          location: "Xã Hiếu Nghĩa, Huyện Vũng Liêm, Tỉnh Vĩnh Long",
+          capacityTons: 110,
+          currentTons: 65,
+          bufferDaysAvg: 3.2,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho bảo quản ngắn hạn 16°C - 20°C",
+          functions: "Tiếp nhận cam từ ghe vận tải cù lao",
+          status: "Vận hành tối ưu",
+        },
+        {
+          id: "KHO-HG-04",
+          name: "Kho Mát Vệ Tinh Châu Thành (Hậu Giang)",
+          location: "Khu vực bến sông Đông Phú, Huyện Châu Thành, Hậu Giang",
+          capacityTons: 150,
+          currentTons: 85,
+          bufferDaysAvg: 3.0,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho bảo quản độ ẩm 85%, kiểm soát nhiệt độ",
+          functions: "Tập kết từ ghe nông dân, Đóng sọt chuẩn 20kg",
+          status: "Vận hành tối ưu",
+        },
+        {
+          id: "KHO-TG-05",
+          name: "Điểm Tập Kết Liên Tỉnh Cái Bè (Tiền Giang)",
+          location: "Cụm liên kết nông sản Hậu Mỹ Bắc, Cái Bè, Tiền Giang",
+          capacityTons: 120,
+          currentTons: 80,
+          bufferDaysAvg: 3.8,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho lạnh đệm 15°C phục vụ xe tải đường dài",
+          functions: "Điều tiết xuất hàng đi Chợ Đầu Mối & Siêu thị TP.HCM",
+          status: "Vận hành tối ưu",
+        },
+        {
+          id: "KHO-ST-06",
+          name: "Kho Vệ Tinh Kế Sách & Bến Tre",
+          location: "Huyện Kế Sách (Sóc Trăng) & Chợ Lách (Bến Tre)",
+          capacityTons: 140,
+          currentTons: 75,
+          bufferDaysAvg: 2.8,
+          maxRecommendedDays: 5,
+          tempCondition: "Kho thoáng mát ven sông Hậu & Cổ Chiên",
+          functions: "Tập kết trái cây an toàn, dán tem QR",
+          status: "Vận hành tối ưu",
+        },
+      ];
+
+      // Traceability Lots with Integrated Invoice Metadata
+      let traceabilityLots = [
+        {
+          lotCode: "QR-CS-ĐBSCL-901",
+          invoiceId: "HDXK-101-01",
+          contractId: "HD-3B-101",
+          farmerName: "Nguyễn Văn Mười (NH-VL-01)",
+          pucCode: "VN-VLOT-001",
+          standard: "VietGAP (Chứng nhận: VG-VL-9012)",
+          harvestDate: "23/10/2026",
+          batchWeightTons: 22.5,
+          batchWeightText:
+            "22.5 tấn (12.5T Loại 1 | 7.5T Loại 2 | 2.5T Loại 3)",
+          unitPrice: 18000,
+          totalAmount: 405000000,
+          collectionHub: "Kho Đệm Trung Tâm Vĩnh Long (Lưu trữ: 1.5 ngày)",
+          destination: "Hệ thống Siêu thị Co.opmart & WinMart",
+          transportVehicle: "Xe tải lạnh 64C-092.15 (Nhiệt độ thùng xe 16°C)",
+          status: "Đã xuất hóa đơn & Giao hàng thành công",
+        },
+        {
+          lotCode: "QR-CS-ĐBSCL-902",
+          invoiceId: "HDXK-102-01",
+          contractId: "HD-3B-102",
+          farmerName: "Trần Văn Khải (NH-HG-05)",
+          pucCode: "VN-HGCT-005",
+          standard: "VietGAP (Chứng nhận: VG-HG-8840)",
+          harvestDate: "22/10/2026",
+          batchWeightTons: 28.0,
+          batchWeightText:
+            "28.0 tấn (14.0T Loại 1 | 11.2T Loại 2 | 2.8T Loại 3)",
+          unitPrice: 16500,
+          totalAmount: 462000000,
+          collectionHub: "Kho Vệ Tinh Châu Thành (Lưu trữ: 2 ngày)",
+          destination: "Chuỗi Bách Hóa Xanh & KingFoodmart",
+          transportVehicle: "Ghe tải 30 tấn ST-552.18 có mái che mát",
+          status: "Đã xuất hóa đơn & Đang trung chuyển",
+        },
+        {
+          lotCode: "QR-CS-ĐBSCL-903",
+          invoiceId: "HDXK-103-01",
+          contractId: "HD-3B-103",
+          farmerName: "Nguyễn Minh Trí (NH-TG-07)",
+          pucCode: "VN-TGCB-007",
+          standard: "GlobalGAP (Chứng chỉ quốc tế)",
+          harvestDate: "21/10/2026",
+          batchWeightTons: 18.0,
+          batchWeightText: "18.0 tấn (Chuyên loại 3 cho ép nước)",
+          unitPrice: 7500,
+          totalAmount: 135000000,
+          collectionHub: "Điểm Tập Kết Liên Tỉnh Cái Bè (Lưu trữ: 2.5 ngày)",
+          destination: "Nhà máy Chế biến Nông sản ĐBSCL Food",
+          transportVehicle: "Xe tải 63C-114.80 có gắn GPS hành trình",
+          status: "Đã hoàn tất thanh toán hóa đơn",
+        },
+        {
+          lotCode: "QR-CS-ĐBSCL-904",
+          invoiceId: "HDXK-104-01",
+          contractId: "HD-3B-104",
+          farmerName: "Lê Hoàng Nam (NH-VL-02)",
+          pucCode: "VN-VLTB-002",
+          standard: "GlobalGAP",
+          harvestDate: "20/10/2026",
+          batchWeightTons: 30.0,
+          batchWeightText: "30.0 tấn (Loại 2 giao chợ đầu mối)",
+          unitPrice: 13000,
+          totalAmount: 390000000,
+          collectionHub: "Kho Điểm Tập Kết Tam Bình (Vĩnh Long)",
+          destination: "Hợp tác Thương lái Chợ Đầu Mối Thủ Đức",
+          transportVehicle: "Xe tải lớn 51D-892.40",
+          status: "Đã hạ hàng & Quyết toán xong",
+        },
+        {
+          lotCode: "QR-CS-ĐBSCL-905",
+          invoiceId: "HDXK-101-02",
+          contractId: "HD-3B-101",
+          farmerName: "Võ Thành Đạt (NH-VL-03)",
+          pucCode: "VN-VLVL-003",
+          standard: "Hữu cơ",
+          harvestDate: "23/10/2026",
+          batchWeightTons: 15.0,
+          batchWeightText: "15.0 tấn (Loại 1 tuyển chọn đặc biệt)",
+          unitPrice: 18000,
+          totalAmount: 270000000,
+          collectionHub: "Kho Đệm Trung Tâm Vĩnh Long (Trà Ôn)",
+          destination: "Hệ thống Siêu thị Co.opmart & WinMart",
+          transportVehicle: "Xe lạnh 64C-033.91",
+          status: "Vừa xuất kho & Cấp hóa đơn",
+        },
+      ];
+
+      let selectedLotIndex = 0;
+      let activeOrderForDelivery = null;
+
+      // --- 2. NAVIGATION & TABS ---
+      function switchTab(tabId) {
+        const tabs = [
+          "dashboard",
+          "farmers",
+          "partners",
+          "grading",
+          "logistics",
+        ];
+        const titles = {
+          dashboard: "Tổng quan Cân đối Cung - Cầu & Kế hoạch Tiêu thụ",
+          farmers: "Quản lý Nông hộ & Vùng Nguyên Liệu ĐBSCL (Mã PUC)",
+          partners: "Đơn hàng Doanh nghiệp, Thương lái & Hóa đơn Xuất hàng",
+          grading: "Phân loại Sản phẩm & Cơ chế Giá Minh bạch",
+          logistics: "Điểm Tập kết, Kho Đệm, Nhật Ký Lô Hàng & Hóa Đơn Điện Tử",
+        };
+
+        tabs.forEach((t) => {
+          document.getElementById("tab-" + t).classList.add("hidden");
+          const navBtn = document.getElementById("nav-" + t);
+          navBtn.classList.remove("tab-active");
+          navBtn.classList.add("text-emerald-100", "hover:bg-emerald-900/80");
+        });
+
+        document.getElementById("tab-" + tabId).classList.remove("hidden");
+        const activeBtn = document.getElementById("nav-" + tabId);
+        activeBtn.classList.add("tab-active");
+        activeBtn.classList.remove(
+          "text-emerald-100",
+          "hover:bg-emerald-900/80",
+        );
+
+        document.getElementById("pageTitle").textContent = titles[tabId];
+
+        const sidebar = document.getElementById("sidebar");
+        if (!sidebar.classList.contains("-translate-x-full")) {
+          toggleMobileSidebar();
+        }
+      }
+
+      function toggleMobileSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const backdrop = document.getElementById("sidebarBackdrop");
+        sidebar.classList.toggle("-translate-x-full");
+        backdrop.classList.toggle("hidden");
+      }
+
+      function switchPartnerSubTab(subTab) {
+        const views = ["enterprises", "traders", "contracts"];
+        views.forEach((v) => {
+          document.getElementById("partnerView-" + v).classList.add("hidden");
+          const btn = document.getElementById("subtab-" + v);
+          btn.className =
+            "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        });
+        document
+          .getElementById("partnerView-" + subTab)
+          .classList.remove("hidden");
+        document.getElementById("subtab-" + subTab).className =
+          "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-700 text-white shadow-sm transition";
+      }
+
+      // --- 3. SUPPLY - DEMAND CALCULATIONS ---
+      function updateSupplyDemandMetrics() {
+        const totalArea = farmersData.reduce(
+          (sum, f) => sum + Number(f.area),
+          0,
+        );
+        const totalExpected = farmersData.reduce(
+          (sum, f) => sum + Number(f.expectedTons),
+          0,
+        );
+        const totalActual = farmersData.reduce(
+          (sum, f) => sum + Number(f.actualTons),
+          0,
+        );
+        const totalContracted = enterpriseOrders.reduce(
+          (sum, o) => sum + Number(o.contractedTons),
+          0,
+        );
+        const unallocated = Math.max(0, totalExpected - totalContracted);
+        const contractedRatio =
+          totalExpected > 0
+            ? ((totalContracted / totalExpected) * 100).toFixed(1)
+            : 0;
+        const actualRatio =
+          totalExpected > 0
+            ? Math.round((totalActual / totalExpected) * 100)
+            : 0;
+
+        document.getElementById("kpiTotalArea").textContent =
+          totalArea.toFixed(1) + " ha";
+        document.getElementById("kpiFarmerCount").textContent =
+          `${farmersData.length} mã PUC (6 tỉnh)`;
+        document.getElementById("kpiExpectedSupply").textContent =
+          totalExpected.toLocaleString("vi-VN") + " tấn";
+        document.getElementById("kpiActualHarvested").textContent =
+          `${totalActual.toLocaleString("vi-VN")} tấn (${actualRatio}%)`;
+        document.getElementById("kpiContractedVolume").textContent =
+          totalContracted.toLocaleString("vi-VN") + " tấn";
+        document.getElementById("kpiContractedRatio").textContent =
+          `${contractedRatio}% tổng cung`;
+        document.getElementById("kpiUnallocatedVolume").textContent =
+          unallocated.toLocaleString("vi-VN") + " tấn";
+
+        document.getElementById("badge-farmers-count").textContent =
+          farmersData.length;
+        document.getElementById("badge-partners-count").textContent =
+          enterpriseOrders.length + managedTraders.length;
+        document.getElementById("badge-invoices-count").textContent =
+          `${traceabilityLots.length} HĐ`;
+        document.getElementById("chartSummaryBadge").textContent =
+          `Đã phân bổ: ${totalContracted.toLocaleString("vi-VN")} / ${totalExpected.toLocaleString("vi-VN")} tấn`;
+
+        const banner = document.getElementById("surplusAlertBanner");
+        const unallocatedCard = document.getElementById("unallocatedCard");
+        const unallocatedStatusText = document.getElementById(
+          "unallocatedStatusText",
+        );
+        document.getElementById("bannerUnallocatedText").textContent =
+          `${unallocated.toLocaleString("vi-VN")} tấn cam dự kiến`;
+        document.getElementById("suppModalRemainingText").textContent =
+          `${unallocated.toLocaleString("vi-VN")} tấn`;
+
+        if (unallocated <= 0) {
+          banner.classList.add("hidden");
+          unallocatedCard.className =
+            "bg-emerald-50 rounded-2xl p-5 border-2 border-emerald-400 shadow-sm flex flex-col justify-between";
+          unallocatedStatusText.textContent = "100% sản lượng đã có đầu ra!";
+          unallocatedStatusText.className = "text-emerald-800 font-bold";
+        } else {
+          banner.classList.remove("hidden");
+          unallocatedCard.className =
+            "bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 border-2 border-orange-300 shadow-sm flex flex-col justify-between";
+          unallocatedStatusText.textContent = "Kích hoạt kênh bổ sung sớm!";
+          unallocatedStatusText.className = "text-orange-800 font-medium";
+        }
+
+        renderChannelBreakdown(totalExpected, totalContracted, unallocated);
+        renderWeeklySchedule();
+      }
+
+      function renderChannelBreakdown(
+        totalExpected,
+        totalContracted,
+        unallocated,
+      ) {
+        const channels = [
+          {
+            name: "Hệ thống Siêu thị & Bán lẻ hiện đại (Loại 1)",
+            key: "Siêu thị & Bán lẻ hiện đại",
+            color: "bg-emerald-600",
+            badge: "Giá trị cao",
+          },
+          {
+            name: "Chợ đầu mối & Mạng lưới Thương lái liên kết (Loại 2)",
+            key: "Chợ đầu mối & Thương lái đối tác",
+            color: "bg-blue-600",
+            badge: "Tiêu thụ nhanh",
+          },
+          {
+            name: "Doanh nghiệp Chế biến sâu: Nước ép, Mứt sấy, Tinh dầu (Loại 3)",
+            key: "Chế biến sâu (Nước ép/Mứt/Sấy)",
+            color: "bg-orange-500",
+            badge: "Cam nguyên liệu",
+          },
+          {
+            name: "Sàn TMĐT OCOP & Chuỗi Đồ uống F&B (Loại 1 & 2)",
+            key: "Thương mại điện tử & Chuỗi F&B",
+            color: "bg-purple-600",
+            badge: "Bán trực tiếp",
+          },
+        ];
+
+        const container = document.getElementById("channelBreakdownList");
+        let html = "";
+
+        channels.forEach((c) => {
+          const vol = enterpriseOrders
+            .filter((o) => o.channelType === c.key)
+            .reduce((s, o) => s + Number(o.contractedTons), 0);
+          const pct =
+            totalExpected > 0
+              ? Math.min(100, Math.round((vol / totalExpected) * 100))
+              : 0;
+
+          html += `
+                    <div class="space-y-1.5">
+                        <div class="flex flex-wrap items-center justify-between text-xs gap-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-slate-700">${c.name}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-600">${c.badge}</span>
+                            </div>
+                            <span class="font-extrabold text-slate-800">${vol.toLocaleString("vi-VN")} tấn (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div class="${c.color} h-2.5 rounded-full transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+        });
+
+        const unallocPct =
+          totalExpected > 0
+            ? Math.min(100, Math.round((unallocated / totalExpected) * 100))
+            : 0;
+        html += `
+                <div class="space-y-1.5 pt-2 border-t border-dashed border-slate-200">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-bold text-orange-700"><i class="fa-solid fa-circle-exclamation mr-1"></i>Sản lượng dự kiến chưa có hợp đồng bao tiêu:</span>
+                        <span class="font-extrabold text-orange-600">${unallocated.toLocaleString("vi-VN")} tấn (${unallocPct}%)</span>
+                    </div>
+                    <div class="w-full bg-orange-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-orange-500 h-2.5 rounded-full transition-all duration-500" style="width: ${unallocPct}%"></div>
+                    </div>
+                </div>
+            `;
+
+        container.innerHTML = html;
+      }
+
+      function renderWeeklySchedule() {
+        const weeks = [
+          "Tuần 1 (01-07/11)",
+          "Tuần 2 (08-15/11)",
+          "Tuần 3 (16-23/11)",
+          "Tuần 4 (24-30/11)",
+        ];
+        const grid = document.getElementById("weeklyScheduleGrid");
+        let html = "";
+
+        weeks.forEach((w) => {
+          const weekFarmers = farmersData.filter((f) => f.harvestWeek === w);
+          const weekTons = weekFarmers.reduce(
+            (s, f) => s + Number(f.expectedTons),
+            0,
+          );
+          const isHigh = weekTons > 450;
+
+          html += `
+                    <div class="p-3.5 rounded-xl border ${isHigh ? "bg-amber-50/70 border-amber-300" : "bg-slate-50 border-slate-200/80"} space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-700">${w}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isHigh ? "bg-amber-200 text-amber-900" : "bg-emerald-100 text-emerald-800"}">
+                                ${weekFarmers.length} hộ
+                            </span>
+                        </div>
+                        <div class="text-lg font-extrabold ${isHigh ? "text-amber-700" : "text-slate-800"}">${weekTons} tấn</div>
+                        <div class="text-[11px] text-slate-500 leading-tight">
+                            ${isHigh ? "Cao điểm thu hoạch - Chuẩn bị kho đệm & xe" : "Nhịp độ cắt cam cân đối với đơn hàng"}
+                        </div>
+                    </div>
+                `;
+        });
+
+        grid.innerHTML = html;
+      }
+
+      function rebalanceHarvestSchedule() {
+        const weeks = [
+          "Tuần 1 (01-07/11)",
+          "Tuần 2 (08-15/11)",
+          "Tuần 3 (16-23/11)",
+          "Tuần 4 (24-30/11)",
+        ];
+        farmersData.forEach((f, idx) => {
+          f.harvestWeek = weeks[idx % 4];
+        });
+        updateSupplyDemandMetrics();
+        renderFarmersTable();
+        showToast(
+          "Đã tối ưu hóa lịch cắt cam rải đều giữa các tỉnh Vĩnh Long, Hậu Giang, Tiền Giang, Bến Tre!",
+          "success",
+        );
+      }
+
+      // --- 4. RENDER FARMERS TABLE (WITH PUC CODE DISPLAY & SEARCH) ---
+      function renderFarmersTable() {
+        const search = document
+          .getElementById("farmerSearchInput")
+          .value.toLowerCase();
+        const province = document.getElementById("farmerProvinceFilter").value;
+        const std = document.getElementById("farmerStandardFilter").value;
+        const contract = document.getElementById("farmerContractFilter").value;
+
+        const filtered = farmersData.filter((f) => {
+          const matchSearch =
+            f.name.toLowerCase().includes(search) ||
+            f.id.toLowerCase().includes(search) ||
+            f.orchardCode.toLowerCase().includes(search);
+          const matchProvince = province === "ALL" || f.province === province;
+          const matchStd = std === "ALL" || f.standard === std;
+          const matchContract =
+            contract === "ALL" || f.contractStatus === contract;
+          return matchSearch && matchProvince && matchStd && matchContract;
+        });
+
+        const tbody = document.getElementById("farmersTableBody");
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400">Không tìm thấy nông hộ hoặc mã PUC phù hợp với tiêu chí lọc.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered
+          .map((f) => {
+            const stdBadge =
+              f.standard === "GlobalGAP"
+                ? "bg-purple-100 text-purple-800"
+                : f.standard === "VietGAP"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : f.standard === "Hữu cơ"
+                    ? "bg-teal-100 text-teal-800"
+                    : "bg-blue-100 text-blue-800";
+
+            const contractBadge =
+              f.contractStatus === "Đã ký HĐ 3 bên"
+                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                : "bg-amber-50 text-amber-700 border border-amber-200";
+
+            return `
+                    <tr class="hover:bg-slate-50/90 transition">
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-800 text-xs">${f.id}</div>
+                            <div class="text-[11px] font-mono font-extrabold text-emerald-800 mt-0.5 inline-flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                <i class="fa-solid fa-barcode text-[10px] text-emerald-600"></i>${f.orchardCode}
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="font-bold text-slate-800">${f.name}</div>
+                            <div class="text-xs text-slate-500">${f.zone} • <strong class="text-slate-700">${f.province}</strong> • ${f.phone}</div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${stdBadge}">${f.standard}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-semibold text-slate-700">${f.area} ha</td>
+                        <td class="py-3.5 px-4 text-right">
+                            <div class="font-extrabold text-slate-800">${f.expectedTons} tấn</div>
+                            <div class="text-[10px] text-slate-400">${f.gradeRatio}</div>
+                        </td>
+                        <td class="py-3.5 px-4 text-right font-bold text-blue-700">${f.actualTons} tấn</td>
+                        <td class="py-3.5 px-4">
+                            <span class="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg">${f.harvestWeek}</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${contractBadge}">${f.contractStatus}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <button onclick="quickAddHarvest('${f.id}')" title="Thu hoạch và tự động nhập kho" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold border border-emerald-200 transition">
+                                    + Thu hoạch
+                                </button>
+                                <button onclick="inspectFarmerTraceability('${f.id}')" title="Xem mã vùng PUC và lô xuất kho" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs transition">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+          })
+          .join("");
+      }
+
+      // Helper function to map a farmer to their local storage hub
+      function getHubForFarmer(farmer) {
+        if (farmer.province === "Hậu Giang") {
+          return (
+            storageHubs.find((h) => h.id === "KHO-HG-04") || storageHubs[0]
+          );
+        } else if (farmer.province === "Tiền Giang") {
+          return (
+            storageHubs.find((h) => h.id === "KHO-TG-05") || storageHubs[0]
+          );
+        } else if (
+          farmer.province === "Bến Tre" ||
+          farmer.province === "Sóc Trăng" ||
+          farmer.province === "Cần Thơ"
+        ) {
+          return (
+            storageHubs.find((h) => h.id === "KHO-ST-06") || storageHubs[0]
+          );
+        } else {
+          // Vĩnh Long
+          if (farmer.zone.includes("Tam Bình")) {
+            return (
+              storageHubs.find((h) => h.id === "KHO-VL-02") || storageHubs[0]
+            );
+          } else if (farmer.zone.includes("Vũng Liêm")) {
+            return (
+              storageHubs.find((h) => h.id === "KHO-VL-03") || storageHubs[0]
+            );
+          } else {
+            return (
+              storageHubs.find((h) => h.id === "KHO-VL-01") || storageHubs[0]
+            );
+          }
+        }
+      }
+
+      let activeFarmerForHarvest = null;
+
+      // Hàm mở Modal khi bấm nút "+ Thu hoạch"
+      function quickAddHarvest(farmerId) {
+        const farmer = farmersData.find((f) => f.id === farmerId);
+        if (!farmer) return;
+
+        const remainingToHarvest = farmer.expectedTons - farmer.actualTons;
+        if (remainingToHarvest <= 0) {
+          showToast(
+            `Hộ ${farmer.name} (Mã PUC: ${farmer.orchardCode}) đã thu hoạch đủ 100% sản lượng dự kiến!`,
+            "info",
+          );
+          return;
+        }
+
+        activeFarmerForHarvest = farmer;
+        document.getElementById("harvModalFarmerCode").textContent =
+          `${farmer.id} • ${farmer.orchardCode}`;
+        document.getElementById("harvModalFarmerName").textContent =
+          `${farmer.name} (${farmer.zone} - ${farmer.province})`;
+        document.getElementById("harvModalExpectedTons").textContent =
+          `${farmer.expectedTons} tấn`;
+        document.getElementById("harvModalActualTons").textContent =
+          `${farmer.actualTons} tấn`;
+        document.getElementById("harvModalRemainingTons").textContent =
+          `${remainingToHarvest} tấn`;
+
+        // Điền trước số gợi ý
+        document.getElementById("harvInputTons").value = Math.min(
+          20,
+          remainingToHarvest,
+        );
+
+        // Ngày thu hoạch mặc định là hôm nay
+        document.getElementById("harvInputDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
+
+        // Đổ danh sách kho và chọn kho phù hợp với hộ
+        const defaultHub = getHubForFarmer(farmer);
+        const hubSelect = document.getElementById("harvInputHub");
+        hubSelect.innerHTML = storageHubs
+          .map(
+            (h) => `
+        <option value="${h.id}" ${defaultHub && defaultHub.id === h.id ? "selected" : ""}>
+            ${h.name} (Tồn hiện tại: ${h.currentTons}/${h.capacityTons} tấn)
+        </option>
+    `,
+          )
+          .join("");
+
+        document.getElementById("harvestModal").classList.remove("hidden");
+      }
+
+      function closeHarvestModal() {
+        document.getElementById("harvestModal").classList.add("hidden");
+        activeFarmerForHarvest = null;
+      }
+
+      // Xử lý lưu khi bấm "Xác Nhận Nhập Kho"
+      function submitHarvestForm(e) {
+        e.preventDefault();
+        if (!activeFarmerForHarvest) return;
+
+        const farmer = activeFarmerForHarvest;
+        const tonsHarvested =
+          parseFloat(document.getElementById("harvInputTons").value) || 0;
+        const harvDate = document.getElementById("harvInputDate").value;
+        const targetHubId = document.getElementById("harvInputHub").value;
+
+        if (tonsHarvested <= 0) {
+          showToast("Số lượng thu hoạch phải lớn hơn 0 tấn!", "info");
+          return;
+        }
+
+        // Cập nhật sản lượng hộ
+        farmer.actualTons += tonsHarvested;
+
+        // Cập nhật kho tiếp nhận
+        const targetHub =
+          storageHubs.find((h) => h.id === targetHubId) ||
+          getHubForFarmer(farmer);
+        if (targetHub) {
+          targetHub.currentTons += tonsHarvested;
+          const occPct = Math.round(
+            (targetHub.currentTons / targetHub.capacityTons) * 100,
+          );
+          if (occPct >= 85) {
+            targetHub.status = `Cảnh báo: Tồn kho ${occPct}% sức chứa - Cần xuất hàng gấp!`;
+          } else {
+            targetHub.status = `Vừa nhập +${tonsHarvested}T từ hộ ${farmer.name} (${farmer.orchardCode})`;
+          }
+        }
+
+        // Tạo bản ghi lô truy xuất QR
+        const dateFormatted = harvDate
+          ? new Date(harvDate).toLocaleDateString("vi-VN")
+          : new Date().toLocaleDateString("vi-VN");
+        const autoInvoiceId = `HDNK-${Math.floor(100 + Math.random() * 900)}`;
+
+        traceabilityLots.unshift({
+          lotCode: `QR-CS-${targetHub ? targetHub.id : "KHO"}-${Math.floor(100 + Math.random() * 900)}`,
+          invoiceId: autoInvoiceId,
+          contractId: "HTX-THU-HOẠCH",
+          farmerName: `${farmer.name} (${farmer.id})`,
+          orchardCode: `${farmer.orchardCode} (${farmer.zone})`,
+          pucCode: farmer.orchardCode,
+          standard: farmer.standard,
+          harvestDate: dateFormatted,
+          batchWeight: `${tonsHarvested} tấn (Nhập từ vườn về kho)`,
+          batchWeightTons: tonsHarvested,
+          batchWeightText: `${tonsHarvested} tấn (Nhập từ vườn về kho)`,
+          unitPrice: 15000,
+          totalAmount: tonsHarvested * 1000 * 15000,
+          collectionHub: `${targetHub.name} (Tồn kho hiện tại: ${targetHub.currentTons}/${targetHub.capacityTons}T)`,
+          destination: "Đang lưu kho đệm chờ xuất giao theo đơn",
+          transportVehicle: "Ghe/Xe tải thu gom nông vụ",
+          status: "Đã nhập kho đệm HTX",
+        });
+
+        closeHarvestModal();
+        updateSupplyDemandMetrics();
+        renderFarmersTable();
+        renderLogisticsAndTraceability();
+
+        showToast(
+          `Đã ghi nhận thu hoạch +${tonsHarvested} tấn từ hộ ${farmer.name} [${farmer.orchardCode}] vào ${targetHub.name}!`,
+          "success",
+        );
+      }
+
+      function inspectFarmerTraceability(farmerId) {
+        const farmer = farmersData.find((f) => f.id === farmerId);
+        if (!farmer) return;
+
+        // Find matching lot
+        const foundIdx = traceabilityLots.findIndex(
+          (l) =>
+            l.pucCode === farmer.orchardCode ||
+            l.farmerName.includes(farmer.name),
+        );
+        if (foundIdx !== -1) {
+          selectedLotIndex = foundIdx;
+        }
+        switchTab("logistics");
+        renderLogisticsAndTraceability();
+        showToast(
+          `Đang hiển thị chứng thư xuất kho & nguồn gốc mã PUC ${farmer.orchardCode} của hộ ${farmer.name}`,
+          "info",
+        );
+      }
+
+      // --- 5. RENDER PARTNERS & INTERACTIVE INVOICE SYSTEM (FEATURE #2) ---
+      function renderEnterprisesAndTraders() {
+        const entContainer = document.getElementById(
+          "enterpriseCardsContainer",
+        );
+        entContainer.innerHTML = enterpriseOrders
+          .map((o) => {
+            const progress = Math.min(
+              100,
+              Math.round((o.deliveredTons / o.contractedTons) * 100),
+            );
+            const remaining = Math.max(0, o.contractedTons - o.deliveredTons);
+            const isCompleted = o.deliveredTons >= o.contractedTons;
+
+            const statusBadge = isCompleted
+              ? '<span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-600 text-white"><i class="fa-solid fa-circle-check mr-1"></i>Đã hoàn thành 100%</span>'
+              : o.deliveredTons > 0
+                ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800"><i class="fa-solid fa-truck mr-1"></i>Đang giao hàng</span>'
+                : '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800"><i class="fa-solid fa-clock mr-1"></i>Chờ xuất hàng</span>';
+
+            // Render clickable invoice tags
+            const invoiceTagsHtml =
+              o.invoices && o.invoices.length > 0
+                ? o.invoices
+                    .map(
+                      (inv) => `
+                        <button onclick="navigateToInvoice('${inv}')" title="Bấm để xem Hóa đơn & Nhật ký lô hàng" class="invoice-tag-bounce px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-700 font-mono text-xs font-bold transition flex items-center gap-1 shadow-xs">
+                            <i class="fa-solid fa-receipt text-[10px]"></i>
+                            <span>${inv}</span>
+                        </button>
+                    `,
+                    )
+                    .join("")
+                : `<span class="text-[11px] text-slate-400 italic">Chưa phát hành hóa đơn nào</span>`;
+
+            return `
+                    <div class="bg-white rounded-2xl border ${isCompleted ? "border-emerald-300" : "border-slate-200/90"} shadow-sm p-5 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2.5">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-700">${o.channelType}</span>
+                                <span class="font-mono text-xs font-bold text-slate-400">${o.id}</span>
+                            </div>
+                            
+                            <h4 class="font-extrabold text-slate-800 text-base leading-snug">${o.partnerName}</h4>
+                            
+                            <div class="flex items-center justify-between">
+                                ${statusBadge}
+                                <span class="text-[11px] text-slate-400">Gần nhất: ${o.lastDelivery || "Chưa giao"}</span>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5 text-xs">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Phẩm cấp:</span>
+                                    <span class="font-bold text-slate-800">${o.gradeReq}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Cơ chế giá:</span>
+                                    <span class="font-bold text-emerald-700">${o.priceRule}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-500">Lịch giao:</span>
+                                    <span class="font-medium text-slate-700">${o.schedule}</span>
+                                </div>
+                            </div>
+
+                            <!-- INVOICES LIST ON CONTRACT CARD (REQUIREMENT #2) -->
+                            <div class="pt-2 border-t border-slate-100">
+                                <div class="flex items-center justify-between text-xs mb-1.5">
+                                    <span class="font-bold text-slate-700 flex items-center gap-1">
+                                        <i class="fa-solid fa-file-invoice text-blue-600"></i>Hóa đơn đã xuất (${o.invoices ? o.invoices.length : 0}):
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-medium">Bấm hóa đơn để xem lô</span>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${invoiceTagsHtml}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-100">
+                            <div class="flex justify-between text-xs items-baseline">
+                                <span class="text-slate-600 font-medium">
+                                    Đã giao: <strong class="text-slate-900">${o.deliveredTons}</strong> / ${o.contractedTons} tấn
+                                    ${remaining > 0 ? `<span class="text-orange-600 ml-1">(Còn ${remaining}T)</span>` : ""}
+                                </span>
+                                <span class="font-extrabold ${isCompleted ? "text-emerald-700" : "text-blue-700"}">${progress}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                                <div class="${isCompleted ? "bg-emerald-600" : "bg-blue-600"} h-2.5 rounded-full transition-all duration-500" style="width: ${progress}%"></div>
+                            </div>
+
+                            <!-- ACTION BUTTON: CONFIRM DELIVERY & ISSUE INVOICE -->
+                            <div class="pt-2 flex items-center justify-between gap-2">
+                                <button onclick="openDeliveryModal('${o.id}')" class="w-full py-2 px-3 rounded-xl ${isCompleted ? "bg-slate-100 hover:bg-slate-200 text-slate-700" : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"} text-xs font-bold transition flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-truck-arrow-right"></i>
+                                    <span>${isCompleted ? "Cập nhật thêm đợt giao" : "Giao hàng & Lập hóa đơn mới"}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+
+        const trdContainer = document.getElementById("tradersCardsContainer");
+        trdContainer.innerHTML = managedTraders
+          .map(
+            (t) => `
+                <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-800">Thương lái Đối tác HTX</span>
+                            <span class="font-mono text-xs font-bold text-slate-400">${t.id}</span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-800 text-base">${t.name}</h4>
+                        <p class="text-xs text-slate-500"><i class="fa-solid fa-user-check mr-1 text-emerald-600"></i>Đại diện: <strong>${t.leader}</strong> (${t.phone})</p>
+                        
+                        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5 text-xs">
+                            <div><span class="text-slate-500">Tuyến phụ trách:</span> <strong class="text-slate-800">${t.assignedZone}</strong></div>
+                            <div><span class="text-slate-500">Phương tiện:</span> <strong class="text-slate-800">${t.transport}</strong></div>
+                            <div><span class="text-slate-500">Sản lượng khoán:</span> <strong class="text-blue-700">${t.quotaTons} tấn/vụ</strong></div>
+                            <div><span class="text-slate-500">Thù lao điều phối:</span> <strong class="text-emerald-700">${t.commission}</strong></div>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-emerald-700 font-bold"><i class="fa-solid fa-shield-check mr-1"></i>${t.compliance}</span>
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      // --- CLICK ON INVOICE TO JUMP TO LOGISTICS TAB & HIGHLIGHT (REQUIREMENT #2) ---
+      function navigateToInvoice(invoiceId) {
+        // Find lot corresponding to invoiceId
+        const lotIndex = traceabilityLots.findIndex(
+          (l) => l.invoiceId === invoiceId,
+        );
+        if (lotIndex !== -1) {
+          selectedLotIndex = lotIndex;
+        } else {
+          // If not found directly, find by matching contract
+          selectedLotIndex = 0;
+        }
+
+        // Switch to logistics tab
+        switchTab("logistics");
+        renderLogisticsAndTraceability();
+
+        // Highlight the lot in the list
+        setTimeout(() => {
+          const element = document.getElementById(
+            `lot-item-${selectedLotIndex}`,
+          );
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+            element.classList.add("ring-2", "ring-blue-500", "animate-pulse");
+            setTimeout(
+              () =>
+                element.classList.remove(
+                  "ring-2",
+                  "ring-blue-500",
+                  "animate-pulse",
+                ),
+              3000,
+            );
+          }
+        }, 100);
+
+        showToast(
+          `Đã mở Hóa đơn điện tử [${invoiceId}] & Hộ chiếu nông sản tương ứng!`,
+          "success",
+        );
+      }
+
+      // --- DELIVERY CONFIRMATION & INVOICE ISSUANCE MODAL ---
+      function openDeliveryModal(orderId) {
+        const order = enterpriseOrders.find((o) => o.id === orderId);
+        if (!order) return;
+
+        activeOrderForDelivery = order;
+        document.getElementById("delModalOrderId").textContent = order.id;
+        document.getElementById("delModalPartnerName").textContent =
+          order.partnerName;
+        document.getElementById("delModalTotalTons").textContent =
+          order.contractedTons + " tấn";
+        document.getElementById("delModalDeliveredTons").textContent =
+          order.deliveredTons + " tấn";
+
+        const remaining = Math.max(
+          0,
+          order.contractedTons - order.deliveredTons,
+        );
+        document.getElementById("delModalRemainingTons").textContent =
+          remaining + " tấn";
+
+        // Generate an invoice number: e.g. HDXK-101-03
+        const nextInvIndex = (order.invoices ? order.invoices.length : 0) + 1;
+        const invoiceNumStr = `HDXK-${order.id.replace("HD-3B-", "")}-0${nextInvIndex}`;
+        document.getElementById("delInputInvoiceId").value = invoiceNumStr;
+
+        // Unit price
+        document.getElementById("delInputUnitPrice").value =
+          order.unitPrice || 18000;
+
+        // Populate the Hub select options dynamically with current stock levels
+        const hubSelect = document.getElementById("delInputHub");
+        hubSelect.innerHTML = storageHubs
+          .map(
+            (h) => `
+                <option value="${h.id}">${h.name} (Còn tồn: ${h.currentTons} tấn)</option>
+            `,
+          )
+          .join("");
+
+        // Populate PUC / Farmer options
+        const pucSelect = document.getElementById("delInputPucCode");
+        pucSelect.innerHTML = farmersData
+          .map(
+            (f) => `
+                <option value="${f.orchardCode}">${f.orchardCode} - ${f.name} (${f.province} • Còn ~${Math.max(0, f.expectedTons - f.actualTons)}T)</option>
+            `,
+          )
+          .join("");
+
+        // Pre-fill suggested delivery quantity
+        document.getElementById("delInputTons").value =
+          remaining > 0 ? Math.min(25, remaining) : 10;
+
+        // Set current date
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("delInputDate").value = today;
+
+        document.getElementById("deliveryModal").classList.remove("hidden");
+      }
+
+      function closeDeliveryModal() {
+        document.getElementById("deliveryModal").classList.add("hidden");
+        activeOrderForDelivery = null;
+      }
+
+      function submitDeliveryUpdate(e) {
+        e.preventDefault();
+        if (!activeOrderForDelivery) return;
+
+        const tonsToAdd =
+          parseFloat(document.getElementById("delInputTons").value) || 0;
+        const delDate = document.getElementById("delInputDate").value;
+        const selectedHubId = document.getElementById("delInputHub").value;
+        const vehicle = document.getElementById("delInputVehicle").value;
+        const note = document.getElementById("delInputNote").value;
+        const generatedInvoiceId =
+          document.getElementById("delInputInvoiceId").value;
+        const unitPrice =
+          parseFloat(document.getElementById("delInputUnitPrice").value) ||
+          18000;
+        const selectedPuc = document.getElementById("delInputPucCode").value;
+
+        if (tonsToAdd <= 0) {
+          showToast("Khối lượng giao hàng phải lớn hơn 0 tấn!", "info");
+          return;
+        }
+
+        // Find selected hub and deduct stock
+        const sourceHub =
+          storageHubs.find((h) => h.id === selectedHubId) || storageHubs[0];
+        if (sourceHub.currentTons < tonsToAdd) {
+          showToast(
+            `Kho "${sourceHub.name}" hiện chỉ còn tồn ${sourceHub.currentTons} tấn, không đủ xuất ${tonsToAdd} tấn! Vui lòng chọn kho khác hoặc điều chỉnh khối lượng.`,
+            "info",
+          );
+          return;
+        }
+
+        // Deduct stock from chosen hub
+        sourceHub.currentTons = Math.max(0, sourceHub.currentTons - tonsToAdd);
+        sourceHub.status = `Vừa xuất ${tonsToAdd}T giao ${activeOrderForDelivery.partnerName} [HĐ: ${generatedInvoiceId}]`;
+
+        activeOrderForDelivery.deliveredTons += tonsToAdd;
+        activeOrderForDelivery.lastDelivery = new Date(
+          delDate,
+        ).toLocaleDateString("vi-VN");
+
+        if (!activeOrderForDelivery.invoices) {
+          activeOrderForDelivery.invoices = [];
+        }
+        activeOrderForDelivery.invoices.push(generatedInvoiceId);
+
+        if (
+          activeOrderForDelivery.deliveredTons >=
+          activeOrderForDelivery.contractedTons
+        ) {
+          activeOrderForDelivery.status = "Đã hoàn thành 100%";
+        } else {
+          activeOrderForDelivery.status = "Đang thực hiện giao";
+        }
+
+        // Find farmer matching PUC
+        const matchedFarmer = farmersData.find(
+          (f) => f.orchardCode === selectedPuc,
+        );
+        const farmerDisplayName = matchedFarmer
+          ? `${matchedFarmer.name} (${matchedFarmer.id})`
+          : `Vùng trồng mã ${selectedPuc}`;
+        const farmerStandard = matchedFarmer
+          ? matchedFarmer.standard
+          : "VietGAP";
+
+        const totalAmount = tonsToAdd * 1000 * unitPrice;
+
+        // Create a record in Traceability Lots
+        const newLotRecord = {
+          lotCode: `QR-CS-${sourceHub.id}-${Math.floor(1000 + Math.random() * 9000)}`,
+          invoiceId: generatedInvoiceId,
+          contractId: activeOrderForDelivery.id,
+          farmerName: farmerDisplayName,
+          pucCode: selectedPuc,
+          standard: farmerStandard,
+          harvestDate: new Date(delDate).toLocaleDateString("vi-VN"),
+          batchWeightTons: tonsToAdd,
+          batchWeightText: `${tonsToAdd} tấn (${activeOrderForDelivery.gradeReq})`,
+          unitPrice: unitPrice,
+          totalAmount: totalAmount,
+          collectionHub: `${sourceHub.name} (Tồn kho sau xuất: ${sourceHub.currentTons}T)`,
+          destination: activeOrderForDelivery.partnerName,
+          transportVehicle: `${vehicle} (${note || "Chứng từ kiểm nghiệm hợp lệ"})`,
+          status: "Đã xuất hóa đơn & Đang giao",
+        };
+
+        traceabilityLots.unshift(newLotRecord);
+        selectedLotIndex = 0;
+
+        closeDeliveryModal();
+        updateSupplyDemandMetrics();
+        renderEnterprisesAndTraders();
+        renderLogisticsAndTraceability();
+
+        showToast(
+          `Đã xuất hóa đơn [${generatedInvoiceId}] và xuất kho ${tonsToAdd} tấn cho ${activeOrderForDelivery.partnerName}!`,
+          "success",
+        );
+      }
+
+      // --- 6. GRADING & PRICE CALCULATOR ---
+      function adjustGradingSliders(changedSlider) {
+        let g1 = parseInt(document.getElementById("calcG1Slider").value, 10);
+        let g2 = parseInt(document.getElementById("calcG2Slider").value, 10);
+
+        if (g1 + g2 > 100) {
+          if (changedSlider === 1) {
+            g2 = 100 - g1;
+            document.getElementById("calcG2Slider").value = g2;
+          } else {
+            g1 = 100 - g2;
+            document.getElementById("calcG1Slider").value = g1;
+          }
+        }
+        runGradingCalculator();
+      }
+
+      function runGradingCalculator() {
+        const batchTons =
+          parseFloat(document.getElementById("calcBatchWeight").value) || 0;
+        const ungradedPrice =
+          parseFloat(document.getElementById("calcUngradedPrice").value) ||
+          11000;
+
+        const g1Pct = parseInt(
+          document.getElementById("calcG1Slider").value,
+          10,
+        );
+        const g2Pct = parseInt(
+          document.getElementById("calcG2Slider").value,
+          10,
+        );
+        const g3Pct = Math.max(0, 100 - g1Pct - g2Pct);
+
+        const g1Tons = (batchTons * g1Pct) / 100;
+        const g2Tons = (batchTons * g2Pct) / 100;
+        const g3Tons = (batchTons * g3Pct) / 100;
+
+        document.getElementById("calcG1PctLabel").textContent =
+          `${g1Pct}% (${g1Tons.toFixed(1)} tấn)`;
+        document.getElementById("calcG2PctLabel").textContent =
+          `${g2Pct}% (${g2Tons.toFixed(1)} tấn)`;
+        document.getElementById("calcG3PctLabel").textContent =
+          `${g3Pct}% (${g3Tons.toFixed(1)} tấn)`;
+        document.getElementById("calcG3Bar").style.width = `${g3Pct}%`;
+
+        const p1 = 18000;
+        const p2 = 13000;
+        const p3 = 7500;
+
+        const revG1 = g1Tons * 1000 * p1;
+        const revG2 = g2Tons * 1000 * p2;
+        const revG3 = g3Tons * 1000 * p3;
+        const totalGradedRev = revG1 + revG2 + revG3;
+
+        const totalUngradedRev = batchTons * 1000 * ungradedPrice;
+        const diffRev = totalGradedRev - totalUngradedRev;
+        const diffPct =
+          totalUngradedRev > 0
+            ? ((diffRev / totalUngradedRev) * 100).toFixed(1)
+            : 0;
+        const avgPrice =
+          batchTons > 0 ? Math.round(totalGradedRev / (batchTons * 1000)) : 0;
+
+        document.getElementById("calcTotalGradedRevenue").textContent =
+          totalGradedRev.toLocaleString("vi-VN") + " đ";
+        document.getElementById("calcAveragePriceText").innerHTML =
+          `Giá bình quân đạt: <strong>${avgPrice.toLocaleString("vi-VN")} đ/kg</strong>`;
+        document.getElementById("calcUngradedRevenue").textContent =
+          totalUngradedRev.toLocaleString("vi-VN") + " đ";
+
+        const sign = diffRev >= 0 ? "+" : "";
+        document.getElementById("calcValueAdded").textContent =
+          `${sign}${diffRev.toLocaleString("vi-VN")} đ (${sign}${diffPct}%)`;
+
+        document.getElementById("calcChannelAllocationSuggestion").innerHTML = `
+                <div>• <strong>${g1Tons.toFixed(1)} tấn Loại 1:</strong> Đóng thùng tem QR chuyển Siêu thị & Sàn OCOP</div>
+                <div>• <strong>${g2Tons.toFixed(1)} tấn Loại 2:</strong> Giao Chợ đầu mối Thủ Đức & Chuỗi Quán Nước F&B</div>
+                <div>• <strong>${g3Tons.toFixed(1)} tấn Loại 3:</strong> Chuyển Nhà máy ĐBSCL Food ép nước lon & sấy mứt</div>
+            `;
+      }
+
+      // --- 7. LOGISTICS & TRACEABILITY & INVOICE DISPLAY (REQUIREMENT #2) ---
+      function renderLogisticsAndTraceability() {
+        const hubsContainer = document.getElementById("storageHubsContainer");
+        hubsContainer.innerHTML = storageHubs
+          .map((h) => {
+            const occPct = Math.round((h.currentTons / h.capacityTons) * 100);
+            const isNearLimit = h.bufferDaysAvg >= 4.0;
+            return `
+                    <div class="p-5 rounded-2xl border ${isNearLimit ? "bg-amber-50/60 border-amber-300" : "bg-slate-50/70 border-slate-200"} flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isNearLimit ? "bg-amber-500 text-white" : "bg-emerald-700 text-white"}">${h.id}</span>
+                                <span class="text-xs font-bold ${isNearLimit ? "text-amber-800" : "text-emerald-700"}">Lưu kho TB: ${h.bufferDaysAvg} / ${h.maxRecommendedDays} ngày</span>
+                            </div>
+                            <h4 class="font-extrabold text-slate-800 text-base">${h.name}</h4>
+                            <p class="text-xs text-slate-500"><i class="fa-solid fa-location-dot mr-1"></i>${h.location}</p>
+                            <div class="p-3 rounded-xl bg-white border border-slate-200/80 text-xs space-y-1">
+                                <div><span class="text-slate-500">Môi trường:</span> <strong class="text-slate-800">${h.tempCondition}</strong></div>
+                                <div><span class="text-slate-500">Công năng:</span> <strong class="text-slate-700">${h.functions}</strong></div>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-600">Dung lượng đệm: <strong>${h.currentTons}/${h.capacityTons} tấn</strong></span>
+                                <span class="font-bold text-slate-800">${occPct}%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                                <div class="${isNearLimit ? "bg-amber-500" : "bg-emerald-600"} h-2 rounded-full" style="width: ${occPct}%"></div>
+                            </div>
+                            <p class="text-[11px] font-semibold ${isNearLimit ? "text-amber-700" : "text-emerald-700"} pt-1">
+                                <i class="fa-solid fa-circle-info mr-1"></i>${h.status}
+                            </p>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+
+        const lotsContainer = document.getElementById("traceabilityLotsList");
+        document.getElementById("lotsCounterDisplay").textContent =
+          `${traceabilityLots.length} lô xuất kho`;
+
+        lotsContainer.innerHTML = traceabilityLots
+          .map((lot, idx) => {
+            const isSelected = idx === selectedLotIndex;
+            return `
+                    <div id="lot-item-${idx}" onclick="selectTraceabilityLot(${idx})" class="p-4 rounded-xl border cursor-pointer transition ${isSelected ? "bg-emerald-50/90 border-emerald-500 shadow-md ring-2 ring-emerald-500/30" : "bg-slate-50/70 border-slate-200 hover:bg-slate-100"} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2 py-0.5 rounded bg-emerald-800 text-white text-xs font-bold font-mono">${lot.lotCode}</span>
+                                ${lot.invoiceId ? `<span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-xs font-mono font-extrabold border border-blue-300"><i class="fa-solid fa-receipt mr-1"></i>${lot.invoiceId}</span>` : ""}
+                                <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[11px] font-mono font-bold"><i class="fa-solid fa-barcode mr-1"></i>${lot.pucCode || "PUC"}</span>
+                            </div>
+                            <div class="font-bold text-slate-800 text-sm">${lot.farmerName} • <span class="text-blue-700 font-extrabold">${lot.batchWeightText}</span></div>
+                            <div class="text-xs text-slate-500 flex items-center gap-2 flex-wrap">
+                                <span><i class="fa-solid fa-truck-fast mr-1 text-orange-500"></i>${lot.destination}</span>
+                                <span>• Ngày: <strong>${lot.harvestDate}</strong></span>
+                            </div>
+                        </div>
+                        <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+                            <span class="text-xs font-bold text-emerald-700">${lot.status}</span>
+                            <button class="px-3 py-1.5 rounded-lg ${isSelected ? "bg-emerald-700 text-white" : "bg-white border border-slate-300 text-slate-700"} text-xs font-bold transition flex items-center gap-1">
+                                <i class="fa-solid fa-file-invoice text-xs"></i>Xem Chi Tiết HĐ
+                            </button>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+
+        renderSelectedQRPassport();
+      }
+
+      function selectTraceabilityLot(index) {
+        selectedLotIndex = index;
+        renderLogisticsAndTraceability();
+      }
+
+      function renderSelectedQRPassport() {
+        const lot = traceabilityLots[selectedLotIndex];
+        if (!lot) return;
+
+        const card = document.getElementById("qrPassportCard");
+        card.innerHTML = `
+                <!-- Invoice Header Bar -->
+                <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-10 h-10 rounded-xl orange-gradient text-white flex items-center justify-center text-lg font-bold shadow-sm">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">Hóa Đơn Điện Tử & Hộ Chiếu Nông Sản</span>
+                            <h4 class="font-black text-slate-800 text-base leading-tight">HTX CAM SÀNH ĐBSCL</h4>
+                        </div>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">Đã Xác Thực Chuỗi</span>
+                </div>
+
+                <!-- Invoice Banner with QR Code -->
+                <div class="p-4 rounded-xl bg-gradient-to-r from-slate-50 to-emerald-50/50 border border-slate-200 flex items-center gap-4">
+                    <div class="w-24 h-24 rounded-xl bg-white border-2 border-slate-800 p-2 flex flex-col items-center justify-center shrink-0 shadow-sm">
+                        <i class="fa-solid fa-qrcode text-5xl text-slate-800"></i>
+                        <span class="text-[8px] font-mono font-bold text-slate-600 mt-1">VERIFIED PUC</span>
+                    </div>
+                    <div class="space-y-1 text-xs flex-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-slate-400 font-semibold uppercase text-[10px]">Số Hóa Đơn:</span>
+                            <span class="font-mono font-black text-blue-700 text-sm bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${lot.invoiceId || "HD-LE-CHUA-SO"}</span>
+                        </div>
+                        <div>Mã Lô: <strong class="text-emerald-800 font-mono">${lot.lotCode}</strong></div>
+                        <div>Hợp đồng gốc: <strong class="text-slate-700">${lot.contractId || "HĐ Bao tiêu vụ 2026"}</strong></div>
+                        <div>Thời gian xuất: <strong>${lot.harvestDate}</strong></div>
+                        <div>Tiêu chuẩn: <strong class="text-emerald-700">${lot.standard}</strong></div>
+                    </div>
+                </div>
+
+                <!-- Financial / Invoice Breakdown Table -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+                    <div class="flex justify-between items-center text-slate-500 font-bold uppercase text-[10px] border-b border-slate-200 pb-1">
+                        <span>Quy cách & Khối lượng</span>
+                        <span>Đơn giá</span>
+                        <span class="text-right">Thành tiền</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-800 font-semibold">
+                        <div>
+                            <div>${lot.batchWeightText}</div>
+                            <div class="text-[11px] text-slate-500 font-normal">Trọng lượng tính tiền: ${lot.batchWeightTons ? (lot.batchWeightTons * 1000).toLocaleString("vi-VN") : "22,500"} kg</div>
+                        </div>
+                        <div class="text-slate-700 font-mono">${lot.unitPrice ? lot.unitPrice.toLocaleString("vi-VN") : "18,000"} đ</div>
+                        <div class="text-right font-black text-emerald-800 text-sm font-mono">
+                            ${lot.totalAmount ? lot.totalAmount.toLocaleString("vi-VN") : "405,000,000"} đ
+                        </div>
+                    </div>
+                    <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-[11px]">
+                        <span class="text-slate-500">Thuế GTGT / Phí điều phối HTX:</span>
+                        <span class="font-bold text-emerald-700">Miễn thuế HTX Nông nghiệp</span>
+                    </div>
+                </div>
+
+                <!-- Traceability Details / PUC Origin -->
+                <div class="space-y-2.5 text-xs">
+                    <div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200/80">
+                        <div class="font-bold text-emerald-950 flex items-center justify-between">
+                            <span><i class="fa-solid fa-seedling mr-1.5 text-emerald-600"></i>1. Nguồn Gốc Mã Vùng Trồng (PUC):</span>
+                            <span class="font-mono bg-white px-2 py-0.5 rounded border border-emerald-300 text-emerald-800 font-extrabold text-[11px]">${lot.pucCode}</span>
+                        </div>
+                        <div class="text-slate-700 mt-1">${lot.farmerName} — Tiêu chuẩn canh tác đã chứng nhận.</div>
+                    </div>
+
+                    <div class="p-2.5 rounded-lg bg-blue-50/70 border border-blue-200/80">
+                        <div class="font-bold text-blue-950"><i class="fa-solid fa-warehouse mr-1.5 text-blue-600"></i>2. Điểm Tập Kết & Kho Đệm:</div>
+                        <div class="text-slate-700 mt-0.5">${lot.collectionHub}</div>
+                    </div>
+
+                    <div class="p-2.5 rounded-lg bg-orange-50/70 border border-orange-200/80">
+                        <div class="font-bold text-orange-950"><i class="fa-solid fa-truck-fast mr-1.5 text-orange-600"></i>3. Vận Chuyển & Đích Đến:</div>
+                        <div class="text-slate-700 mt-0.5">Phương tiện: <strong>${lot.transportVehicle}</strong></div>
+                        <div class="text-slate-700 mt-0.5">Đơn vị nhận hàng: <strong>${lot.destination}</strong></div>
+                    </div>
+                </div>
+
+                <div class="pt-1 flex items-center justify-end gap-2">
+                    <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i>In Phiếu Hóa Đơn & Mã QR
+                    </button>
+                </div>
+            `;
+      }
+
+      // --- 8. PUC GENERATION & MODAL HELPER LOGIC (REQUIREMENT #1) ---
+      function generatePucCode(province) {
+        const prefixMap = {
+          "Vĩnh Long": "VN-VLOT",
+          "Hậu Giang": "VN-HGCT",
+          "Tiền Giang": "VN-TGCB",
+          "Bến Tre": "VN-BTCL",
+          "Sóc Trăng": "VN-STKS",
+          "Cần Thơ": "VN-CTPD",
+        };
+        const prefix = prefixMap[province] || "VN-DBSCL";
+        const randomNum = Math.floor(100 + Math.random() * 900);
+        return `${prefix}-${randomNum}`;
+      }
+
+      function onProvinceChangedInModal() {
+        const province = document.getElementById("fmProvince").value;
+        document.getElementById("fmOrchardCode").value =
+          generatePucCode(province);
+      }
+
+      function regenerateSuggestedPuc() {
+        const province = document.getElementById("fmProvince").value;
+        document.getElementById("fmOrchardCode").value =
+          generatePucCode(province);
+        showToast("Đã tạo mã PUC gợi ý mới theo tỉnh!", "info");
+      }
+
+      function openFarmerModal() {
+        // Pre-fill suggested PUC code based on current selected province
+        const province = document.getElementById("fmProvince").value;
+        document.getElementById("fmOrchardCode").value =
+          generatePucCode(province);
+        document.getElementById("farmerModal").classList.remove("hidden");
+      }
+
+      function closeFarmerModal() {
+        document.getElementById("farmerModal").classList.add("hidden");
+      }
+
+      function saveFarmerForm(e) {
+        e.preventDefault();
+        const name = document.getElementById("fmName").value.trim();
+        const province = document.getElementById("fmProvince").value;
+        const customPuc = document
+          .getElementById("fmOrchardCode")
+          .value.trim()
+          .toUpperCase();
+        const zoneDistrict = document
+          .getElementById("fmZoneDistrict")
+          .value.trim();
+        const phone = document.getElementById("fmPhone").value.trim();
+        const area = parseFloat(document.getElementById("fmArea").value) || 5;
+        const expectedTons =
+          parseInt(document.getElementById("fmExpected").value, 10) || 80;
+        const actualTons =
+          parseInt(document.getElementById("fmActual").value, 10) || 0;
+        const standard = document.getElementById("fmStandard").value;
+        const harvestWeek = document.getElementById("fmHarvestWeek").value;
+
+        if (!customPuc) {
+          showToast("Vui lòng nhập Mã số vùng trồng (PUC)!", "info");
+          return;
+        }
+
+        const nextNum = farmersData.length + 1;
+        const pCode =
+          province === "Vĩnh Long"
+            ? "VL"
+            : province === "Hậu Giang"
+              ? "HG"
+              : province === "Tiền Giang"
+                ? "TG"
+                : province === "Bến Tre"
+                  ? "BT"
+                  : province === "Sóc Trăng"
+                    ? "ST"
+                    : "CT";
+
+        const newFarmer = {
+          id: `NH-${pCode}-${nextNum < 10 ? "0" + nextNum : nextNum}`,
+          orchardCode: customPuc, // Using the user-entered or confirmed PUC code
+          name,
+          phone,
+          province,
+          zone: zoneDistrict,
+          area,
+          expectedTons,
+          actualTons,
+          harvestWeek,
+          standard,
+          contractStatus: "Đã ký HĐ 3 bên",
+          gradeRatio: "50% L1 - 35% L2 - 15% L3",
+        };
+
+        farmersData.unshift(newFarmer);
+        closeFarmerModal();
+        e.target.reset();
+
+        updateSupplyDemandMetrics();
+        renderFarmersTable();
+        showToast(
+          `Đã thêm nông hộ ${name} với Mã vùng trồng (PUC): ${customPuc}!`,
+          "success",
+        );
+      }
+
+      function openOrderModal() {
+        document.getElementById("orderModal").classList.remove("hidden");
+      }
+      function closeOrderModal() {
+        document.getElementById("orderModal").classList.add("hidden");
+      }
+
+      function saveOrderForm(e) {
+        e.preventDefault();
+        const partnerName = document
+          .getElementById("ordPartnerName")
+          .value.trim();
+        const channelType = document.getElementById("ordChannelType").value;
+        const gradeReq = document.getElementById("ordGradeReq").value;
+        const contractedTons =
+          parseInt(document.getElementById("ordVolume").value, 10) || 80;
+        const priceRule = document.getElementById("ordPricingRule").value;
+
+        const newOrder = {
+          id: `HD-3B-${100 + enterpriseOrders.length + 1}`,
+          partnerName,
+          channelType,
+          gradeReq,
+          contractedTons,
+          deliveredTons: 0,
+          priceRule,
+          unitPrice: 17000,
+          paymentTerm: "Ký quỹ 20%, quyết toán theo đợt giao",
+          schedule: "Giao theo lịch điều phối thu hoạch HTX",
+          lastDelivery: "Mới tạo đơn",
+          status: "Chờ xuất hàng",
+          invoices: [],
+        };
+
+        enterpriseOrders.unshift(newOrder);
+        closeOrderModal();
+        e.target.reset();
+
+        updateSupplyDemandMetrics();
+        renderEnterprisesAndTraders();
+        showToast(
+          `Đã ký hợp đồng ${contractedTons} tấn với ${partnerName}! Bảng cân đối cung - cầu đã được cập nhật.`,
+          "success",
+        );
+      }
+
+      function openSupplementaryChannelModal() {
+        document
+          .getElementById("supplementaryModal")
+          .classList.remove("hidden");
+      }
+      function closeSupplementaryChannelModal() {
+        document.getElementById("supplementaryModal").classList.add("hidden");
+      }
+
+      function allocateSurplusQuick(partnerName, channelType, gradeReq, tons) {
+        const newOrder = {
+          id: `HD-BS-${200 + enterpriseOrders.length + 1}`,
+          partnerName,
+          channelType,
+          gradeReq,
+          contractedTons: tons,
+          deliveredTons: 0,
+          priceRule: "Giá điều phối linh hoạt theo phẩm cấp",
+          unitPrice: 12000,
+          paymentTerm: "Thanh toán theo chuyến giao",
+          schedule: "Ưu tiên giải phóng khi vào vụ rộ",
+          lastDelivery: "Mới kích hoạt",
+          status: "Đang phân bổ",
+          invoices: [],
+        };
+
+        enterpriseOrders.unshift(newOrder);
+        updateSupplyDemandMetrics();
+        renderEnterprisesAndTraders();
+        closeSupplementaryChannelModal();
+        showToast(
+          `Đã kích hoạt phân bổ ${tons} tấn cam cho "${partnerName}"!`,
+          "success",
+        );
+      }
+
+      function openTraderModal() {
+        const newTrader = {
+          id: `TL-HTX-0${managedTraders.length + 1}`,
+          name: "Tổ Thương Lái Liên Vùng Sóc Trăng - Cần Thơ",
+          leader: "Ông Huỳnh Minh Chánh",
+          phone: "0939.882.410",
+          assignedZone: "Huyện Kế Sách & Phong Điền",
+          quotaTons: 85,
+          transport: "2 Ghe tải 25 tấn máy lạnh",
+          commission: "Phí điều phối vận tải: 600 đ/kg",
+          compliance: "Tuân thủ 100% bảng giá niêm yết HTX",
+        };
+        managedTraders.push(newTrader);
+        updateSupplyDemandMetrics();
+        renderEnterprisesAndTraders();
+        showToast(
+          "Đã bổ sung Thương lái đối tác vào mạng lưới thu gom điều phối của HTX!",
+          "success",
+        );
+      }
+
+      // --- 9. TOAST NOTIFICATIONS ---
+      function showToast(message, type = "success") {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        const bgClass =
+          type === "success"
+            ? "bg-emerald-950 border-emerald-500 text-white"
+            : "bg-slate-900 border-orange-500 text-white";
+
+        toast.className = `pointer-events-auto p-4 rounded-2xl border-l-4 shadow-2xl flex items-start gap-3 transition-all duration-300 ${bgClass}`;
+        toast.innerHTML = `
+                <i class="fa-solid ${type === "success" ? "fa-circle-check text-emerald-400" : "fa-circle-info text-orange-400"} text-lg mt-0.5"></i>
+                <div class="text-xs font-medium leading-relaxed flex-1">${message}</div>
+            `;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("opacity-0", "translate-x-4");
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
+      // --- 10. APP INITIALIZATION ---
+      window.onload = function () {
+        const now = new Date();
+        document.getElementById("currentDateDisplay").textContent =
+          "Vụ Cam Sành ĐBSCL • Cập nhật: " + now.toLocaleDateString("vi-VN");
+
+        updateSupplyDemandMetrics();
+        renderFarmersTable();
+        renderEnterprisesAndTraders();
+        runGradingCalculator();
+        renderLogisticsAndTraceability();
+      };
+    </script>
+  </body>
+</html>
